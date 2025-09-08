@@ -13,6 +13,7 @@ dependencies:
   flutter_native_splash: ^2.4.6
   video_player: ^2.8.3
   image_picker: ^0.8.7+5
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -28,6 +29,20 @@ flutter:
     - assets/images/black.png
     - assets/videos/splash_screen.mp4
     - assets/images/google_logo.png
+    - assets/images/location_pin.png
+    - assets/images/profile_placeholder.png
+    - assets/images/activities.png
+    - assets/images/dining.png
+    - assets/images/events.png
+    - assets/images/for_you.png
+    - assets/images/movies.png
+    - assets/images/slide1.png
+    - assets/images/slide2.png
+    - assets/images/slide3.png
+    - assets/images/spotlight1.png
+    - assets/images/spotlight2.png
+    - assets/images/spotlight3.png
+    - assets/images/ai_assistant_logo.png
 
 flutter_native_splash:
   android: true

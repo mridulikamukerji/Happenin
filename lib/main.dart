@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:image_picker/image_picker.dart';
 
+// Import dashboard.dart
+import 'dashboard.dart';
+
 late VideoPlayerController splashController;
 
 Future<void> main() async {
@@ -150,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Login button
+                  // Login button → Navigate to Dashboard
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -162,7 +165,13 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const DashboardPage()),
+                        );
+                      },
                       child: const Text("Login"),
                     ),
                   ),
@@ -192,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 8),
 
-                  // Google button (transparent, authentic logo)
+                  // Google button
                   SizedBox(
                     width: double.infinity,
                     child: TextButton.icon(
@@ -248,8 +257,10 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUpSuccess(BuildContext context) {
-    // Go back to login and show success message
-    Navigator.pop(context);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Account successfully created!"),
@@ -274,6 +285,7 @@ class _SignUpPageState extends State<SignUpPage> {
             padding: const EdgeInsets.all(24.0),
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
                     "Sign Up",
@@ -291,8 +303,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.white24,
-                      backgroundImage:
-                          _profileImage != null ? FileImage(_profileImage!) : null,
+                      backgroundImage: _profileImage != null
+                          ? FileImage(_profileImage!)
+                          : null,
                       child: _profileImage == null
                           ? const Icon(Icons.add_a_photo,
                               size: 40, color: Colors.white70)
@@ -301,38 +314,38 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Full Name field
-                  _buildTextField("Full Name"),
+                  // First Name
+                  _buildTextField("First Name"),
                   const SizedBox(height: 20),
 
-                  // Email field
+                  // Middle Name (Optional)
+                  _buildTextField("Middle Name (if any)"),
+                  const SizedBox(height: 20),
+
+                  // Last Name
+                  _buildTextField("Last Name"),
+                  const SizedBox(height: 20),
+
+                  // Other input fields
                   _buildTextField("Email",
                       keyboardType: TextInputType.emailAddress),
                   const SizedBox(height: 20),
-
-                  // Phone number field
                   _buildTextField("Phone Number",
                       keyboardType: TextInputType.phone),
                   const SizedBox(height: 20),
-
-                  // Username field
                   _buildTextField("Username"),
                   const SizedBox(height: 20),
-
-                  // Password field
                   _buildPasswordField(
                     "Password",
                     _obscurePassword,
                     () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   const SizedBox(height: 20),
-
-                  // Confirm Password field
                   _buildPasswordField(
                     "Confirm Password",
                     _obscureConfirmPassword,
-                    () => setState(
-                        () => _obscureConfirmPassword = !_obscureConfirmPassword),
+                    () => setState(() =>
+                        _obscureConfirmPassword = !_obscureConfirmPassword),
                   ),
                   const SizedBox(height: 30),
 
@@ -358,10 +371,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   // Already have account? Login
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                      );
                     },
                     child: const Text(
-                      "Already have an account? Login",
+                      "Already have an account? Login here",
                       style: TextStyle(color: Colors.white70),
                     ),
                   ),
