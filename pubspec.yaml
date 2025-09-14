@@ -43,6 +43,10 @@ flutter:
     - assets/images/spotlight2.png
     - assets/images/spotlight3.png
     - assets/images/ai_assistant_logo.png
+    - assets/images/buddy1.png
+    - assets/images/buddy2.png
+    - assets/images/buddy3.png
+    - assets/images/buddy4.png
 
 flutter_native_splash:
   android: true

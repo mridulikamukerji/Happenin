@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'buddyfinder.dart'; // ✅ Import BuddyFinder page
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -24,7 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   final List<String> _carouselImages = [
     "assets/images/slide1.png",
-    "assets/images/slide2.png",
+    "assets/images/slide2.png", // ✅ target slide
     "assets/images/slide3.png",
   ];
 
@@ -216,14 +217,28 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       items: _carouselImages.asMap().entries.map((entry) {
                         final imagePath = entry.value;
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Container(
-                            color: _slideColor,
-                            child: Image.asset(
-                              imagePath,
-                              fit: BoxFit.contain,
-                              width: double.infinity,
+                        final index = entry.key;
+
+                        return GestureDetector(
+                          onTap: () {
+                            if (index == 1) {
+                              // ✅ Redirect to Buddy Finder when slide2 clicked
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const BuddyFinderPage()),
+                              );
+                            }
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: Container(
+                              color: _slideColor,
+                              child: Image.asset(
+                                imagePath,
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                              ),
                             ),
                           ),
                         );
