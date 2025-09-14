@@ -10,7 +10,8 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  int _currentIndex = 0;
+  int _currentIndex = 0; // carousel index
+  int _currentFooterIndex = 3; // ✅ default to Home (since Dashboard is home)
 
   // ✅ Unified dark purple color
   final Color _slideColor = const Color(0xFF2E0B5C);
@@ -61,9 +62,20 @@ class _DashboardPageState extends State<DashboardPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildFooterItem(Icons.auto_stories, "Stories"),
-              _buildFooterItem(Icons.chat_bubble, "Chats"),
-              _buildFooterItem(Icons.video_collection, "Shorts"),
+              _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
+                setState(() => _currentFooterIndex = 0);
+              }),
+              _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
+                setState(() => _currentFooterIndex = 1);
+              }),
+              _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
+                setState(() => _currentFooterIndex = 2);
+              }),
+
+              // ✅ HOME
+              _buildFooterItem(Icons.home, "Home", 3, onTap: () {
+                setState(() => _currentFooterIndex = 3);
+              }),
             ],
           ),
         ),
@@ -125,7 +137,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     TextField(
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
-                        hintText: "Search...",
+                        hintText: "Search",
                         hintStyle: const TextStyle(color: Colors.black54),
                         filled: true,
                         fillColor: Colors.white,
@@ -359,17 +371,31 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildFooterItem(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-        ),
-      ],
+  // ---------- UPDATED FOOTER ITEM ----------
+  Widget _buildFooterItem(IconData icon, String label, int index,
+      {VoidCallback? onTap}) {
+    final bool isActive = _currentFooterIndex == index;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isActive ? Colors.purpleAccent : Colors.white70,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? Colors.purpleAccent : Colors.white70,
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
