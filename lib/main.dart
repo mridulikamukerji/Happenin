@@ -11,7 +11,6 @@ late VideoPlayerController splashController;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Preload the video before runApp
   splashController =
       VideoPlayerController.asset('assets/videos/splash_screen.mp4');
   await splashController.initialize();
@@ -244,7 +243,17 @@ class _SignUpPageState extends State<SignUpPage> {
   final ImagePicker _picker = ImagePicker();
   File? _profileImage;
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+
+  // Controllers
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _interestController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController(); // ✅ phone
+  final List<String> _interests = [];
 
   Future<void> _pickImage() async {
     final XFile? image =
@@ -257,6 +266,19 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUpSuccess(BuildContext context) {
+    final userProfile = UserProfile(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      age: int.tryParse(_ageController.text) ?? 0,
+      bio: _bioController.text.trim(),
+      interests: _interests,
+      profileImageUrl: _profileImage?.path ?? "",
+      phoneNumber: _phoneController.text.trim(), // ✅ added
+    );
+
+    debugPrint("UserProfile created: ${userProfile.toMap()}");
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const LoginPage()),
@@ -280,109 +302,164 @@ class _SignUpPageState extends State<SignUpPage> {
             fit: BoxFit.cover,
           ),
         ),
-        child: Center(
+        child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
 
-                  // Profile picture picker
-                  GestureDetector(
-                    onTap: _pickImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.white24,
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!)
-                          : null,
-                      child: _profileImage == null
-                          ? const Icon(Icons.add_a_photo,
-                              size: 40, color: Colors.white70)
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
+                          // Profile picture picker
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.white24,
+                              backgroundImage: _profileImage != null
+                                  ? FileImage(_profileImage!)
+                                  : null,
+                              child: _profileImage == null
+                                  ? const Icon(Icons.add_a_photo,
+                                      size: 40, color: Colors.white70)
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
 
-                  // First Name
-                  _buildTextField("First Name"),
-                  const SizedBox(height: 20),
+                          // First Name
+                          _buildTextField("First Name",
+                              controller: _firstNameController),
+                          const SizedBox(height: 20),
 
-                  // Middle Name (Optional)
-                  _buildTextField("Middle Name (if any)"),
-                  const SizedBox(height: 20),
+                          // Last Name
+                          _buildTextField("Last Name",
+                              controller: _lastNameController),
+                          const SizedBox(height: 20),
 
-                  // Last Name
-                  _buildTextField("Last Name"),
-                  const SizedBox(height: 20),
+                          // Email
+                          _buildTextField("Email",
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress),
+                          const SizedBox(height: 20),
 
-                  // Other input fields
-                  _buildTextField("Email",
-                      keyboardType: TextInputType.emailAddress),
-                  const SizedBox(height: 20),
-                  _buildTextField("Phone Number",
-                      keyboardType: TextInputType.phone),
-                  const SizedBox(height: 20),
-                  _buildTextField("Username"),
-                  const SizedBox(height: 20),
-                  _buildPasswordField(
-                    "Password",
-                    _obscurePassword,
-                    () => setState(() => _obscurePassword = !_obscurePassword),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildPasswordField(
-                    "Confirm Password",
-                    _obscureConfirmPassword,
-                    () => setState(() =>
-                        _obscureConfirmPassword = !_obscureConfirmPassword),
-                  ),
-                  const SizedBox(height: 30),
+                          // Phone
+                          _buildTextField("Phone Number", // ✅ added
+                              controller: _phoneController,
+                              keyboardType: TextInputType.phone),
+                          const SizedBox(height: 20),
 
-                  // Sign Up button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                          // Password
+                          _buildPasswordField("Password", _obscurePassword, () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          }, _passwordController),
+                          const SizedBox(height: 20),
+
+                          // Age
+                          _buildTextField("Age",
+                              controller: _ageController,
+                              keyboardType: TextInputType.number),
+                          const SizedBox(height: 20),
+
+                          // Bio
+                          _buildTextField("Bio", controller: _bioController),
+                          const SizedBox(height: 20),
+
+                          // Interests input
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField("Add Interest",
+                                    controller: _interestController),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add, color: Colors.white),
+                                onPressed: () {
+                                  if (_interestController.text.isNotEmpty) {
+                                    setState(() {
+                                      _interests.add(_interestController.text.trim());
+                                      _interestController.clear();
+                                    });
+                                  }
+                                },
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+
+                          Flexible(
+                            child: SingleChildScrollView(
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: _interests
+                                    .map((interest) => Chip(
+                                          label: Text(interest),
+                                          backgroundColor: Colors.purple,
+                                          labelStyle:
+                                              const TextStyle(color: Colors.white),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+
+                          // Sign Up button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.purple,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: () => _signUpSuccess(context),
+                              child: const Text("Sign Up"),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Already have account? Login
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const LoginPage()),
+                              );
+                            },
+                            child: const Text(
+                              "Already have an account? Login here",
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                        ],
                       ),
-                      onPressed: () => _signUpSuccess(context),
-                      child: const Text("Sign Up"),
                     ),
                   ),
-
-                  const SizedBox(height: 20),
-
-                  // Already have account? Login
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginPage()),
-                      );
-                    },
-                    child: const Text(
-                      "Already have an account? Login here",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ),
@@ -392,8 +469,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
   // Reusable text field
   Widget _buildTextField(String label,
-      {TextInputType keyboardType = TextInputType.text}) {
+      {TextEditingController? controller,
+      TextInputType keyboardType = TextInputType.text}) {
     return TextField(
+      controller: controller,
       keyboardType: keyboardType,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
@@ -410,9 +489,10 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   // Reusable password field
-  Widget _buildPasswordField(
-      String label, bool obscure, VoidCallback toggleVisibility) {
+  Widget _buildPasswordField(String label, bool obscure,
+      VoidCallback toggleVisibility, TextEditingController controller) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
@@ -432,6 +512,57 @@ class _SignUpPageState extends State<SignUpPage> {
           onPressed: toggleVisibility,
         ),
       ),
+    );
+  }
+}
+
+// -------------------------
+// USER PROFILE MODEL
+// -------------------------
+class UserProfile {
+  final String id;
+  final String firstName;
+  final String lastName;
+  final int age;
+  final String bio;
+  final List<String> interests;
+  final String profileImageUrl;
+  final String phoneNumber; // ✅ added
+
+  UserProfile({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.age,
+    required this.bio,
+    required this.interests,
+    required this.profileImageUrl,
+    required this.phoneNumber,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'age': age,
+      'bio': bio,
+      'interests': interests,
+      'profileImageUrl': profileImageUrl,
+      'phoneNumber': phoneNumber, // ✅ added
+    };
+  }
+
+  factory UserProfile.fromMap(Map<String, dynamic> map) {
+    return UserProfile(
+      id: map['id'] ?? '',
+      firstName: map['firstName'] ?? '',
+      lastName: map['lastName'] ?? '',
+      age: map['age'] ?? 0,
+      bio: map['bio'] ?? '',
+      interests: List<String>.from(map['interests'] ?? []),
+      profileImageUrl: map['profileImageUrl'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '', // ✅ added
     );
   }
 }
