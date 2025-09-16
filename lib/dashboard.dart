@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'buddyfinder.dart'; // ✅ Import BuddyFinder page
+import 'chats.dart'; // ✅ Import Chats page
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -12,7 +13,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int _currentIndex = 0; // carousel index
-  int _currentFooterIndex = 3; // ✅ default to Home (since Dashboard is home)
+  int _currentFooterIndex = 3; // ✅ Home should always be active here
 
   // ✅ Unified dark purple color
   final Color _slideColor = const Color(0xFF2E0B5C);
@@ -68,12 +69,16 @@ class _DashboardPageState extends State<DashboardPage> {
               }),
               _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
                 setState(() => _currentFooterIndex = 1);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ChatsPage()),
+                );
               }),
               _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
                 setState(() => _currentFooterIndex = 2);
               }),
 
-              // ✅ HOME
+              // ✅ HOME stays active (highlighted)
               _buildFooterItem(Icons.home, "Home", 3, onTap: () {
                 setState(() => _currentFooterIndex = 3);
               }),
@@ -226,7 +231,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const BuddyFinderPage()),
+                                    builder: (context) =>
+                                        const BuddyFinderPage()),
                               );
                             }
                           },
@@ -389,7 +395,9 @@ class _DashboardPageState extends State<DashboardPage> {
   // ---------- UPDATED FOOTER ITEM ----------
   Widget _buildFooterItem(IconData icon, String label, int index,
       {VoidCallback? onTap}) {
-    final bool isActive = _currentFooterIndex == index;
+    final bool isActive = index == 3
+        ? true // ✅ Always highlight Home on Dashboard
+        : _currentFooterIndex == index;
 
     return GestureDetector(
       onTap: onTap,
