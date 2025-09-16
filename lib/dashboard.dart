@@ -1,9 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'buddyfinder.dart'; // ✅ Import BuddyFinder page
-import 'chats.dart'; // ✅ Import Chats page
-import 'shorts.dart'; // ✅ Import Shorts page
+import 'buddyfinder.dart';
+import 'chats.dart';
+import 'shorts.dart';
+import 'stories.dart'; // ✅ Import Stories page
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -13,10 +14,9 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  int _currentIndex = 0; // carousel index
-  int _currentFooterIndex = 3; // ✅ Home highlighted
+  int _currentIndex = 0;
+  int _currentFooterIndex = 3; // Home highlighted by default
 
-  // ✅ Unified dark purple color
   final Color _slideColor = const Color(0xFF2E0B5C);
 
   final List<String> _headings = [
@@ -27,7 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   final List<String> _carouselImages = [
     "assets/images/slide1.png",
-    "assets/images/slide2.png", // ✅ target slide
+    "assets/images/slide2.png",
     "assets/images/slide3.png",
   ];
 
@@ -55,8 +55,6 @@ class _DashboardPageState extends State<DashboardPage> {
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: null,
-
-      // ---------- FOOTER NAV ----------
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         color: Colors.black.withOpacity(0.6),
@@ -66,22 +64,26 @@ class _DashboardPageState extends State<DashboardPage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
-                // Stories - stay white
+                setState(() => _currentFooterIndex = 0);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const StoriesPage()),
+                );
               }),
               _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
-                Navigator.push(
+                setState(() => _currentFooterIndex = 1);
+                Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => ChatsPage()),
+                  MaterialPageRoute(builder: (_) => const ChatsPage()),
                 );
               }),
               _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
-                Navigator.push(
+                setState(() => _currentFooterIndex = 2);
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const ShortsPage()),
                 );
               }),
-
-              // ✅ HOME highlighted
               _buildFooterItem(Icons.home, "Home", 3, onTap: () {
                 setState(() => _currentFooterIndex = 3);
               }),
@@ -89,10 +91,8 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       ),
-
       body: Stack(
         children: [
-          // ---------- MAIN CONTENT ----------
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -106,7 +106,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ---------- TOP ROW ----------
+                    // Top Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -142,7 +142,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // ---------- SEARCH BAR ----------
+                    // Search Bar
                     TextField(
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
@@ -165,7 +165,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    // ---------- FIXED OPTIONS ----------
+                    // Fixed Options
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: const [
@@ -193,7 +193,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ---------- HEADING ----------
+                    // Heading
                     Center(
                       child: Text(
                         _headings[_currentIndex],
@@ -206,7 +206,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    // ---------- CAROUSEL ----------
+                    // Carousel
                     CarouselSlider(
                       options: CarouselOptions(
                         height: 180,
@@ -254,7 +254,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 10),
 
-                    // ---------- DOT INDICATORS ----------
+                    // Dot Indicators
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: _carouselImages.asMap().entries.map((entry) {
@@ -273,7 +273,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ---------- SPOTLIGHT ----------
+                    // Spotlight
                     const Center(
                       child: Text(
                         "In the Spotlight",
@@ -285,7 +285,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-
                     SizedBox(
                       height: 180,
                       child: ListView.separated(
@@ -358,14 +357,12 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
 
-          // ---------- FLOATING BUTTON (AI) ----------
+          // Floating Button (AI)
           Positioned(
             bottom: math.max(MediaQuery.of(context).padding.bottom, 20),
             right: 30,
             child: GestureDetector(
-              onTap: () {
-                // AI action
-              },
+              onTap: () {},
               child: Container(
                 width: 64,
                 height: 64,
@@ -394,10 +391,10 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ---------- FOOTER ITEM ----------
+  // Footer Item
   Widget _buildFooterItem(IconData icon, String label, int index,
       {VoidCallback? onTap}) {
-    final bool isActive = index == 3; // Only Home is active
+    final bool isActive = _currentFooterIndex == index;
 
     return GestureDetector(
       onTap: onTap,
@@ -423,7 +420,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-// ---------- OPTION ITEM ----------
+// Option Item
 class OptionItem extends StatefulWidget {
   final String imagePath;
   final String label;

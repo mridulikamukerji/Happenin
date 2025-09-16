@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'chatscreen.dart';
 import 'dashboard.dart';
 import 'shorts.dart'; // ✅ Import Shorts page
+import 'stories.dart'; // ✅ Import Stories page
 
 class ChatsPage extends StatefulWidget {
   const ChatsPage({super.key});
@@ -368,12 +369,12 @@ class _ChatsPageState extends State<ChatsPage> {
           isSelectionMode
               ? '${selectedChats.length} selected'
               : 'Chats',
-          style: const TextStyle(color: Colors.white), // always white
+          style: const TextStyle(color: Colors.white),
         ),
         actions: isSelectionMode
             ? [
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.white), // white delete
+                  icon: const Icon(Icons.delete, color: Colors.white),
                   onPressed: _deleteSelectedChats,
                 )
               ]
@@ -506,6 +507,10 @@ class _ChatsPageState extends State<ChatsPage> {
             children: [
               _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
                 setState(() => _currentFooterIndex = 0);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const StoriesPage()),
+                );
               }),
               _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
                 setState(() => _currentFooterIndex = 1);
