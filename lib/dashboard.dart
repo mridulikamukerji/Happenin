@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'buddyfinder.dart'; // ✅ Import BuddyFinder page
 import 'chats.dart'; // ✅ Import Chats page
+import 'shorts.dart'; // ✅ Import Shorts page
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -13,7 +14,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int _currentIndex = 0; // carousel index
-  int _currentFooterIndex = 3; // ✅ Home should always be active here
+  int _currentFooterIndex = 3; // ✅ Home highlighted
 
   // ✅ Unified dark purple color
   final Color _slideColor = const Color(0xFF2E0B5C);
@@ -55,7 +56,7 @@ class _DashboardPageState extends State<DashboardPage> {
       extendBodyBehindAppBar: true,
       appBar: null,
 
-      // ---------- FOOTER NAV (fixed at bottom) ----------
+      // ---------- FOOTER NAV ----------
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         color: Colors.black.withOpacity(0.6),
@@ -65,20 +66,22 @@ class _DashboardPageState extends State<DashboardPage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
-                setState(() => _currentFooterIndex = 0);
+                // Stories - stay white
               }),
               _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
-                setState(() => _currentFooterIndex = 1);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => ChatsPage()),
                 );
               }),
               _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
-                setState(() => _currentFooterIndex = 2);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ShortsPage()),
+                );
               }),
 
-              // ✅ HOME stays active (highlighted)
+              // ✅ HOME highlighted
               _buildFooterItem(Icons.home, "Home", 3, onTap: () {
                 setState(() => _currentFooterIndex = 3);
               }),
@@ -89,7 +92,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
       body: Stack(
         children: [
-          // ---------- MAIN PAGE CONTENT ----------
+          // ---------- MAIN CONTENT ----------
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -162,7 +165,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    // ---------- FIXED ROW OPTIONS ----------
+                    // ---------- FIXED OPTIONS ----------
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: const [
@@ -227,7 +230,6 @@ class _DashboardPageState extends State<DashboardPage> {
                         return GestureDetector(
                           onTap: () {
                             if (index == 1) {
-                              // ✅ Redirect to Buddy Finder when slide2 clicked
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -271,7 +273,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ---------- IN THE SPOTLIGHT ----------
+                    // ---------- SPOTLIGHT ----------
                     const Center(
                       child: Text(
                         "In the Spotlight",
@@ -356,13 +358,13 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
 
-          // ---------- FLOATING BUTTON (AI Assistant) ----------
+          // ---------- FLOATING BUTTON (AI) ----------
           Positioned(
             bottom: math.max(MediaQuery.of(context).padding.bottom, 20),
             right: 30,
             child: GestureDetector(
               onTap: () {
-                // ✅ Handle AI Assistant action
+                // AI action
               },
               child: Container(
                 width: 64,
@@ -392,12 +394,10 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ---------- UPDATED FOOTER ITEM ----------
+  // ---------- FOOTER ITEM ----------
   Widget _buildFooterItem(IconData icon, String label, int index,
       {VoidCallback? onTap}) {
-    final bool isActive = index == 3
-        ? true // ✅ Always highlight Home on Dashboard
-        : _currentFooterIndex == index;
+    final bool isActive = index == 3; // Only Home is active
 
     return GestureDetector(
       onTap: onTap,
@@ -406,13 +406,13 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           Icon(
             icon,
-            color: isActive ? Colors.purpleAccent : Colors.white70,
+            color: isActive ? Colors.purpleAccent : Colors.white,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? Colors.purpleAccent : Colors.white70,
+              color: isActive ? Colors.purpleAccent : Colors.white,
               fontSize: 12,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'chatscreen.dart';
 import 'dashboard.dart';
+import 'shorts.dart'; // ✅ Import Shorts page
 
 class ChatsPage extends StatefulWidget {
   const ChatsPage({super.key});
@@ -107,8 +108,7 @@ class _ChatsPageState extends State<ChatsPage> {
                         itemBuilder: (context, idx) {
                           int personIndex = filteredIndices[idx];
                           var person = people[personIndex];
-                          bool isSelected =
-                              selectedPeople.contains(personIndex);
+                          bool isSelected = selectedPeople.contains(personIndex);
 
                           return Card(
                             color: Colors.black.withOpacity(0.4),
@@ -353,35 +353,33 @@ class _ChatsPageState extends State<ChatsPage> {
     return Scaffold(
       backgroundColor: _slideColor,
       appBar: AppBar(
-  backgroundColor: _slideColor,
-  leading: isSelectionMode
-      ? IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            setState(() {
-              selectedChats.clear();
-            });
-          },
-        )
-      : null,
-  title: Text(
-    isSelectionMode
-        ? '${selectedChats.length} selected'
-        : 'Chats',
-    style: const TextStyle(color: Colors.white), // always white
-  ),
-  actions: isSelectionMode
-      ? [
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.white), // white delete
-            onPressed: _deleteSelectedChats,
-          )
-        ]
-      : null,
-  centerTitle: true,
-),
-
-
+        backgroundColor: _slideColor,
+        leading: isSelectionMode
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  setState(() {
+                    selectedChats.clear();
+                  });
+                },
+              )
+            : null,
+        title: Text(
+          isSelectionMode
+              ? '${selectedChats.length} selected'
+              : 'Chats',
+          style: const TextStyle(color: Colors.white), // always white
+        ),
+        actions: isSelectionMode
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.white), // white delete
+                  onPressed: _deleteSelectedChats,
+                )
+              ]
+            : null,
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           // Search bar for chats
@@ -514,6 +512,10 @@ class _ChatsPageState extends State<ChatsPage> {
               }),
               _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
                 setState(() => _currentFooterIndex = 2);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ShortsPage()),
+                );
               }),
               _buildFooterItem(Icons.home, "Home", 3, onTap: () {
                 setState(() => _currentFooterIndex = 3);

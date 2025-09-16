@@ -48,6 +48,8 @@ flutter:
     - assets/images/buddy3.png
     - assets/images/buddy4.png
     - assets/images/groupchat.png
+    - assets/videos/story1.mp4
+    - assets/videos/story2.mp4
 
 flutter_native_splash:
   android: true
