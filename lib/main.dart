@@ -197,28 +197,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text("Sign Up with Email"),
                     ),
                   ),
-
-                  const SizedBox(height: 8),
-
-                  // Google button
-                  SizedBox(
-                    width: double.infinity,
-                    child: TextButton.icon(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {},
-                      icon: Image.asset(
-                        "assets/images/google_logo.png",
-                        height: 24,
-                      ),
-                      label: const Text("Continue with Google"),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -253,8 +231,11 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _interestController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController(); // ✅ address
+  final TextEditingController _addressController = TextEditingController();
+
+  // Lists
   final List<String> _interests = [];
+  final List<String> _addresses = []; // ✅ dynamic addresses
 
   Future<void> _pickImage() async {
     final XFile? image =
@@ -276,7 +257,7 @@ class _SignUpPageState extends State<SignUpPage> {
       interests: _interests,
       profileImageUrl: _profileImage?.path ?? "",
       phoneNumber: _phoneController.text.trim(),
-      address: _addressController.text.trim(), // ✅ added
+      address: _addresses.join(', '), // ✅ combine multiple addresses
     );
 
     debugPrint("UserProfile created: ${userProfile.toMap()}");
@@ -307,167 +288,177 @@ class _SignUpPageState extends State<SignUpPage> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                    child: IntrinsicHeight(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-
-                          // Profile picture picker
-                          GestureDetector(
-                            onTap: _pickImage,
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.white24,
-                              backgroundImage: _profileImage != null
-                                  ? FileImage(_profileImage!)
-                                  : null,
-                              child: _profileImage == null
-                                  ? const Icon(Icons.add_a_photo,
-                                      size: 40, color: Colors.white70)
-                                  : null,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-
-                          // First Name
-                          _buildTextField("First Name",
-                              controller: _firstNameController),
-                          const SizedBox(height: 20),
-
-                          // Last Name
-                          _buildTextField("Last Name",
-                              controller: _lastNameController),
-                          const SizedBox(height: 20),
-
-                          // Email
-                          _buildTextField("Email",
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress),
-                          const SizedBox(height: 20),
-
-                          // Phone
-                          _buildTextField("Phone Number",
-                              controller: _phoneController,
-                              keyboardType: TextInputType.phone),
-                          const SizedBox(height: 20),
-
-                          // Address ✅
-                          _buildTextField("Address",
-                              controller: _addressController,
-                              keyboardType: TextInputType.streetAddress),
-                          const SizedBox(height: 20),
-
-                          // Password
-                          _buildPasswordField("Password", _obscurePassword, () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          }, _passwordController),
-                          const SizedBox(height: 20),
-
-                          // Age
-                          _buildTextField("Age",
-                              controller: _ageController,
-                              keyboardType: TextInputType.number),
-                          const SizedBox(height: 20),
-
-                          // Bio
-                          _buildTextField("Bio", controller: _bioController),
-                          const SizedBox(height: 20),
-
-                          // Interests input
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildTextField("Add Interest",
-                                    controller: _interestController),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.add, color: Colors.white),
-                                onPressed: () {
-                                  if (_interestController.text.isNotEmpty) {
-                                    setState(() {
-                                      _interests.add(_interestController.text.trim());
-                                      _interestController.clear();
-                                    });
-                                  }
-                                },
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-
-                          Flexible(
-                            child: SingleChildScrollView(
-                              child: Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: _interests
-                                    .map((interest) => Chip(
-                                          label: Text(interest),
-                                          backgroundColor: Colors.purple,
-                                          labelStyle:
-                                              const TextStyle(color: Colors.white),
-                                        ))
-                                    .toList(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-
-                          // Sign Up button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.purple,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: () => _signUpSuccess(context),
-                              child: const Text("Sign Up"),
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Already have account? Login
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const LoginPage()),
-                              );
-                            },
-                            child: const Text(
-                              "Already have an account? Login here",
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                          ),
-                        ],
-                      ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Sign Up",
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                );
-              },
+                  const SizedBox(height: 30),
+
+                  // Profile picture picker
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white24,
+                      backgroundImage:
+                          _profileImage != null ? FileImage(_profileImage!) : null,
+                      child: _profileImage == null
+                          ? const Icon(Icons.add_a_photo,
+                              size: 40, color: Colors.white70)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Fields
+                  _buildTextField("First Name", controller: _firstNameController),
+                  const SizedBox(height: 20),
+                  _buildTextField("Last Name", controller: _lastNameController),
+                  const SizedBox(height: 20),
+                  _buildTextField("Email", controller: _emailController, keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 20),
+                  _buildTextField("Phone Number", controller: _phoneController, keyboardType: TextInputType.phone),
+                  const SizedBox(height: 20),
+
+                  // Address input
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField("Add Address", controller: _addressController),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        onPressed: () {
+                          if (_addressController.text.isNotEmpty) {
+                            setState(() {
+                              _addresses.add(_addressController.text.trim());
+                              _addressController.clear();
+                            });
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Display addresses
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _addresses.length,
+                    itemBuilder: (context, index) {
+                      final address = _addresses[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.purple,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(address, style: const TextStyle(color: Colors.white)),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _addresses.removeAt(index);
+                                  });
+                                },
+                                child: const Icon(Icons.close, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Password field
+                  _buildPasswordField("Password", _obscurePassword, () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  }, _passwordController),
+                  const SizedBox(height: 20),
+
+                  _buildTextField("Age", controller: _ageController, keyboardType: TextInputType.number),
+                  const SizedBox(height: 20),
+                  _buildTextField("Bio", controller: _bioController),
+                  const SizedBox(height: 20),
+
+                  // Interests input
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField("Add Interest", controller: _interestController)),
+                      IconButton(
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        onPressed: () {
+                          if (_interestController.text.isNotEmpty) {
+                            setState(() {
+                              _interests.add(_interestController.text.trim());
+                              _interestController.clear();
+                            });
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _interests.map((interest) => Chip(
+                      label: Text(interest, style: const TextStyle(color: Colors.white)),
+                      backgroundColor: Colors.purple,
+                    )).toList(),
+                  ),
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () => _signUpSuccess(context),
+                      child: const Text("Sign Up"),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                      );
+                    },
+                    child: const Text(
+                      "Already have an account? Login here",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -475,7 +466,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // Reusable text field
   Widget _buildTextField(String label,
       {TextEditingController? controller,
       TextInputType keyboardType = TextInputType.text}) {
@@ -496,7 +486,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // Reusable password field
   Widget _buildPasswordField(String label, bool obscure,
       VoidCallback toggleVisibility, TextEditingController controller) {
     return TextField(
@@ -513,10 +502,8 @@ class _SignUpPageState extends State<SignUpPage> {
           borderSide: BorderSide.none,
         ),
         suffixIcon: IconButton(
-          icon: Icon(
-            obscure ? Icons.visibility : Icons.visibility_off,
-            color: Colors.white70,
-          ),
+          icon: Icon(obscure ? Icons.visibility : Icons.visibility_off,
+              color: Colors.white70),
           onPressed: toggleVisibility,
         ),
       ),
@@ -536,7 +523,7 @@ class UserProfile {
   final List<String> interests;
   final String profileImageUrl;
   final String phoneNumber;
-  final String address; // ✅ added
+  final String address;
 
   UserProfile({
     required this.id,
@@ -560,7 +547,7 @@ class UserProfile {
       'interests': interests,
       'profileImageUrl': profileImageUrl,
       'phoneNumber': phoneNumber,
-      'address': address, // ✅ added
+      'address': address,
     };
   }
 
@@ -574,7 +561,7 @@ class UserProfile {
       interests: List<String>.from(map['interests'] ?? []),
       profileImageUrl: map['profileImageUrl'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
-      address: map['address'] ?? '', // ✅ added
+      address: map['address'] ?? '',
     );
   }
 }

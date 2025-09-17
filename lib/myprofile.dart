@@ -25,8 +25,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
       TextEditingController(text: "john@example.com");
   final TextEditingController _phoneController =
       TextEditingController(text: "9876543210");
-  final TextEditingController _addressController =
-      TextEditingController(text: "123 Main St");
   final TextEditingController _passwordController =
       TextEditingController(text: "password123");
   final TextEditingController _ageController =
@@ -34,9 +32,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
   final TextEditingController _bioController =
       TextEditingController(text: "Love movies, food & events!");
   final TextEditingController _interestController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
-  // Dummy existing interests
+  // Dummy existing interests & addresses
   final List<String> _interests = ["Movies", "Food", "Travel", "Music", "Sports"];
+  final List<String> _addresses = ["123 Main St", "456 Park Ave"]; // example addresses
 
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
@@ -98,6 +98,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // AppBar
                   Row(
@@ -123,26 +124,28 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Profile picture
-                  GestureDetector(
-                    onTap: _pickImage,
-                    child: CircleAvatar(
-                      radius: 55,
-                      backgroundColor: _primaryColor,
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!)
-                          : const AssetImage("assets/images/profile_placeholder.png")
-                              as ImageProvider,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: _primaryColor, width: 2),
+                  // Profile picture centered
+                  Center(
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: CircleAvatar(
+                        radius: 55,
+                        backgroundColor: _primaryColor,
+                        backgroundImage: _profileImage != null
+                            ? FileImage(_profileImage!)
+                            : const AssetImage("assets/images/profile_placeholder.png")
+                                as ImageProvider,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: _primaryColor, width: 2),
+                            ),
+                            padding: const EdgeInsets.all(6),
+                            child: Icon(Icons.edit, color: _primaryColor, size: 18),
                           ),
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(Icons.edit, color: _primaryColor, size: 18),
                         ),
                       ),
                     ),
@@ -158,13 +161,86 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   const SizedBox(height: 16),
                   _buildTextField("Phone Number", _phoneController, keyboardType: TextInputType.phone),
                   const SizedBox(height: 16),
-                  _buildTextField("Address", _addressController),
-                  const SizedBox(height: 16),
                   _buildTextField("Password", _passwordController, obscureText: true),
                   const SizedBox(height: 16),
                   _buildTextField("Age", _ageController, keyboardType: TextInputType.number),
                   const SizedBox(height: 16),
                   _buildTextField("Bio", _bioController),
+                  const SizedBox(height: 16),
+
+                  // Addresses input
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _addressController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: "Add Address",
+                            labelStyle: const TextStyle(color: Colors.white70),
+                            filled: true,
+                            fillColor: Colors.black54,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        onPressed: () {
+                          if (_addressController.text.isNotEmpty) {
+                            setState(() {
+                              _addresses.add(_addressController.text.trim());
+                              _addressController.clear();
+                            });
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Display addresses as vertical list with chip style
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _addresses.length,
+                    itemBuilder: (context, index) {
+                      final address = _addresses[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.purple,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  address,
+                                  style: const TextStyle(color: Colors.white),
+                                  overflow: TextOverflow.visible,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _addresses.removeAt(index);
+                                  });
+                                },
+                                child: const Icon(Icons.close, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 16),
 
                   // Interests input
@@ -201,7 +277,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Display interests as scrollable chips
+                  // Display interests as horizontal chips
                   SizedBox(
                     width: double.infinity,
                     child: SingleChildScrollView(
