@@ -4,13 +4,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'buddyfinder.dart';
 import 'chats.dart';
 import 'shorts.dart';
-import 'stories.dart'; 
+import 'stories.dart';
 import 'aisassistant.dart';
 import 'foryou.dart'; // ✅ Import ForYouPage
 import 'dining.dart';
 import 'movies.dart';
 import 'events.dart';
 import 'activities.dart';
+import 'booking.dart'; // ✅ Import BookingPage
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -335,57 +336,71 @@ class _DashboardPageState extends State<DashboardPage> {
                             const SizedBox(width: 12),
                         itemBuilder: (context, index) {
                           final item = _spotlightItems[index];
-                          return Container(
-                            width: 160,
-                            decoration: BoxDecoration(
-                              color: _slideColor,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(12)),
-                                  child: Image.asset(
-                                    item["image"]!,
-                                    fit: BoxFit.cover,
-                                    height: 100,
-                                    width: double.infinity,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => BookingPage(
+                                    title: item["title"]!,
+                                    image: item["image"]!,
+                                    description: item["description"]!,
                                   ),
                                 ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          item["title"]!,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          item["description"] ?? "",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white70,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                              );
+                            },
+                            child: Container(
+                              width: 160,
+                              decoration: BoxDecoration(
+                                color: _slideColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(12)),
+                                    child: Image.asset(
+                                      item["image"]!,
+                                      fit: BoxFit.cover,
+                                      height: 100,
+                                      width: double.infinity,
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item["title"]!,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            item["description"] ?? "",
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white70,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },

@@ -17,7 +17,6 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
-  int _peopleCount = 1;
   DateTime? _selectedDateTime;
 
   // Static participants list (to integrate with backend later)
@@ -50,10 +49,11 @@ class _BookingPageState extends State<BookingPage> {
 
   List<Map<String, dynamic>> _selectedParticipants = [];
 
+  int get _peopleCount => 1 + _selectedParticipants.length; // ✅ Always consistent
+
   Future<void> _pickDateTime() async {
     final DateTime now = DateTime.now();
 
-    // Pick date (no past dates allowed)
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDateTime ?? now,
@@ -71,7 +71,7 @@ class _BookingPageState extends State<BookingPage> {
             dialogBackgroundColor: Colors.grey[900],
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.white, // ✅ OK & Cancel buttons white
+                foregroundColor: Colors.white,
               ),
             ),
           ),
@@ -82,7 +82,6 @@ class _BookingPageState extends State<BookingPage> {
 
     if (pickedDate == null) return;
 
-    // Pick time
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -94,7 +93,7 @@ class _BookingPageState extends State<BookingPage> {
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.white, // ✅ OK & Cancel white
+                foregroundColor: Colors.white,
               ),
             ),
           ),
@@ -113,7 +112,6 @@ class _BookingPageState extends State<BookingPage> {
       pickedTime.minute,
     );
 
-    // Validate: disallow past times on same day
     if (chosenDateTime.isBefore(now)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("You cannot pick a past time today!")),
@@ -196,7 +194,7 @@ class _BookingPageState extends State<BookingPage> {
     }
 
     final names = _selectedParticipants.isEmpty
-        ? "No participants selected"
+        ? "No additional participants"
         : _selectedParticipants.map((p) => p["name"]).join(", ");
 
     final dateStr =
@@ -217,25 +215,20 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   void _increaseParticipants() {
-    if (_peopleCount >= _allParticipants.length) {
+    if (_selectedParticipants.length >= _allParticipants.length) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text("You cannot add more than available participants.")),
       );
       return;
     }
-
-    setState(() => _peopleCount++);
     _showParticipantPicker();
   }
 
   void _decreaseParticipants() {
-    if (_peopleCount > 1) {
+    if (_selectedParticipants.isNotEmpty) {
       setState(() {
-        _peopleCount--;
-        if (_selectedParticipants.isNotEmpty) {
-          _selectedParticipants.removeLast();
-        }
+        _selectedParticipants.removeLast();
       });
     }
   }
@@ -243,7 +236,6 @@ class _BookingPageState extends State<BookingPage> {
   void _removeParticipant(Map<String, dynamic> participant) {
     setState(() {
       _selectedParticipants.remove(participant);
-      _peopleCount = _selectedParticipants.length.clamp(1, _peopleCount);
     });
   }
 
