@@ -30,7 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _groupImage;
   bool _hasLeftChat = false;
   bool _isGroupNameManuallyEdited = false;
-  Set<String> _blockedParticipants = {};
+  final Set<String> _blockedParticipants = {};
 
   final List<Map<String, dynamic>> _allBuddies = [
     {

@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'dashboard.dart';
 import 'chats.dart';
 import 'shorts.dart';
+import 'addownstory.dart'; // Import new screen
 
 class StoriesPage extends StatefulWidget {
   const StoriesPage({super.key});
@@ -22,31 +22,45 @@ class _StoriesPageState extends State<StoriesPage> {
       "name": "Eren Jaeger",
       "profile": "assets/images/buddy1.png",
       "stories": [
-        {"video": "assets/videos/story1.mp4", "bio": "Tatakae by passion. Cats by love."},
-        {"video": "assets/videos/story3.mp4", "bio": "I know I made your day. You're welcome :)"}
+        {
+          "video": "assets/videos/story1.mp4",
+          "bio": "Tatakae by passion. Cats by love.",
+          "isVideo": true
+        },
+        {
+          "video": "assets/videos/story3.mp4",
+          "bio": "I know I made your day. You're welcome :)",
+          "isVideo": true
+        }
       ]
     },
     {
       "name": "Misa",
       "profile": "assets/images/buddy2.png",
       "stories": [
-        {"video": "assets/videos/story2.mp4", "bio": "Travelling is healing"}
+        {
+          "video": "assets/videos/story2.mp4",
+          "bio": "Travelling is healing",
+          "isVideo": true
+        }
       ]
     },
   ];
 
-  Future<void> _pickVideo() async {
-    final picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickVideo(source: ImageSource.gallery);
-    if (pickedFile != null) {
+  // ----------------- Add Story -----------------
+  Future<void> _addOwnStory() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AddOwnStoryPage()),
+    );
+
+    if (result != null) {
       setState(() {
-        _participants.insert(0, {
-          "name": "You",
-          "profile": "assets/images/profile_placeholder.png",
-          "stories": [
-            {"video": pickedFile.path, "bio": "My new story"}
-          ]
-        });
+        // Remove old "You" story if exists
+        _participants.removeWhere((p) => p["name"] == "You");
+
+        // Insert at the top
+        _participants.insert(0, result);
       });
     }
   }
@@ -60,7 +74,8 @@ class _StoriesPageState extends State<StoriesPage> {
     );
   }
 
-  Widget _buildFooterItem(IconData icon, String label, int index, {VoidCallback? onTap}) {
+  Widget _buildFooterItem(IconData icon, String label, int index,
+      {VoidCallback? onTap}) {
     final bool isActive = _currentFooterIndex == index;
     return GestureDetector(
       onTap: onTap,
@@ -110,7 +125,7 @@ class _StoriesPageState extends State<StoriesPage> {
         itemBuilder: (context, index) {
           if (index == 0) {
             return GestureDetector(
-              onTap: _pickVideo,
+              onTap: _addOwnStory,
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
@@ -146,7 +161,9 @@ class _StoriesPageState extends State<StoriesPage> {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundImage: AssetImage(participant["profile"]),
+                    backgroundImage: participant["profile"].toString().startsWith("assets/")
+                        ? AssetImage(participant["profile"])
+                        : FileImage(File(participant["profile"])) as ImageProvider,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -163,7 +180,8 @@ class _StoriesPageState extends State<StoriesPage> {
                         const SizedBox(height: 4),
                         Text(
                           "${participant["stories"].length} story${participant["stories"].length > 1 ? "ies" : ""}",
-                          style: const TextStyle(color: Colors.white70, fontSize: 12),
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 12),
                         ),
                       ],
                     ),
@@ -231,35 +249,44 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
   @override
   void initState() {
     super.initState();
-    _likedStories = List.generate(widget.participant["stories"].length, (_) => false);
+    _likedStories =
+        List.generate(widget.participant["stories"].length, (_) => false);
     _initializeStory();
   }
 
   Future<void> _initializeStory() async {
     final story = widget.participant["stories"][_currentStoryIndex];
     _videoController?.dispose();
-    final isLocal = File(story["video"]).existsSync();
-    _videoController = isLocal ? VideoPlayerController.file(File(story["video"])) : VideoPlayerController.asset(story["video"]);
-    await _videoController!.initialize();
-    setState(() {});
-    _videoController!.play();
-    _videoController!.addListener(() {
-      if (_videoController!.value.position >= _videoController!.value.duration && !_videoController!.value.isPlaying) {
-        _onStoryComplete();
-      }
+
+    if (story["isVideo"] == true && story["video"] != null) {
+      final file = File(story["video"]);
+      _videoController =
+          file.existsSync() ? VideoPlayerController.file(file) : VideoPlayerController.asset(story["video"]);
+      await _videoController!.initialize();
       setState(() {});
-    });
+      _videoController!.play();
+      _videoController!.setLooping(false);
+      _videoController!.addListener(() {
+        if (_videoController!.value.position >=
+                _videoController!.value.duration &&
+            !_videoController!.value.isPlaying) {
+          _onStoryComplete();
+        }
+        setState(() {});
+      });
+    } else {
+      // background-only story → wait 3s then go next
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) _onStoryComplete();
+      });
+    }
   }
 
   void _onStoryComplete() {
     if (_currentStoryIndex < widget.participant["stories"].length - 1) {
       _nextStory();
     } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const StoriesPage()),
-        (route) => false,
-      );
+      Navigator.pop(context);
     }
   }
 
@@ -280,10 +307,18 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
   }
 
   double _getProgress(int index) {
-    if (_videoController == null || !_videoController!.value.isInitialized) return 0.0;
-    if (index < _currentStoryIndex) return 1.0;
-    if (index > _currentStoryIndex) return 0.0;
-    return _videoController!.value.position.inMilliseconds / _videoController!.value.duration.inMilliseconds;
+    final story = widget.participant["stories"][index];
+    if (story["isVideo"] == true && _videoController != null && _videoController!.value.isInitialized) {
+      if (index < _currentStoryIndex) return 1.0;
+      if (index > _currentStoryIndex) return 0.0;
+      return _videoController!.value.position.inMilliseconds /
+          _videoController!.value.duration.inMilliseconds;
+    } else {
+      // background or image → instant 100% when viewed
+      if (index < _currentStoryIndex) return 1.0;
+      if (index > _currentStoryIndex) return 0.0;
+      return 1.0;
+    }
   }
 
   @override
@@ -296,37 +331,44 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
   Widget build(BuildContext context) {
     final story = widget.participant["stories"][_currentStoryIndex];
     final paddingTop = MediaQuery.of(context).padding.top;
+
+    Widget storyContent;
+    if (story["isVideo"] == true && _videoController != null && _videoController!.value.isInitialized) {
+      storyContent = VideoPlayer(_videoController!);
+    } else if (story["video"] != null && File(story["video"]).existsSync()) {
+      storyContent = Image.file(File(story["video"]), fit: BoxFit.cover);
+    } else if (story["background"] != null) {
+      storyContent = Container(color: Color(story["background"]));
+    } else {
+      storyContent = const Center(child: Text("Story unavailable", style: TextStyle(color: Colors.white)));
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Video + tap areas
+          // Story Content
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTapDown: (details) {
               final width = MediaQuery.of(context).size.width;
-              final bottomLimit = 100;
-              if (details.globalPosition.dy > MediaQuery.of(context).size.height - bottomLimit) return;
               if (details.globalPosition.dx < width / 2) {
                 _previousStory();
               } else {
                 _nextStory();
               }
             },
-            child: SizedBox.expand(
-              child: _videoController != null && _videoController!.value.isInitialized
-                  ? VideoPlayer(_videoController!)
-                  : const Center(child: CircularProgressIndicator()),
-            ),
+            child: SizedBox.expand(child: storyContent),
           ),
 
-          // Progress bars at very top
+          // Progress bars
           Positioned(
             top: paddingTop + 8,
             left: 16,
             right: 16,
             child: Row(
-              children: List.generate(widget.participant["stories"].length, (index) {
+              children: List.generate(widget.participant["stories"].length,
+                  (index) {
                 return Expanded(
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -346,9 +388,9 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
             ),
           ),
 
-          // Header row directly BELOW progress bars
+          // Header row
           Positioned(
-            top: paddingTop + 24, // just below progress
+            top: paddingTop + 24,
             left: 8,
             right: 8,
             child: Row(
@@ -359,7 +401,9 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
                 ),
                 CircleAvatar(
                   radius: 18,
-                  backgroundImage: AssetImage(widget.participant["profile"]),
+                  backgroundImage: widget.participant["profile"].toString().startsWith("assets/")
+                      ? AssetImage(widget.participant["profile"])
+                      : FileImage(File(widget.participant["profile"])) as ImageProvider,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -371,12 +415,17 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _likedStories[_currentStoryIndex] = !_likedStories[_currentStoryIndex];
+                      _likedStories[_currentStoryIndex] =
+                          !_likedStories[_currentStoryIndex];
                     });
                   },
                   child: Icon(
-                    _likedStories[_currentStoryIndex] ? Icons.favorite : Icons.favorite_border,
-                    color: _likedStories[_currentStoryIndex] ? Colors.red : Colors.white,
+                    _likedStories[_currentStoryIndex]
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: _likedStories[_currentStoryIndex]
+                        ? Colors.red
+                        : Colors.white,
                     size: 26,
                   ),
                 ),
@@ -384,26 +433,28 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
             ),
           ),
 
-          // Story description with blurred background
-          Positioned(
-            bottom: 50,
-            left: 16,
-            right: 16,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  color: Colors.black.withOpacity(0.5),
-                  child: Text(
-                    story["bio"],
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+          // Caption
+          if (story["bio"] != null && story["bio"].toString().isNotEmpty)
+            Positioned(
+              bottom: 50,
+              left: 16,
+              right: 16,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    color: Colors.black.withOpacity(0.5),
+                    child: Text(
+                      story["bio"],
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
