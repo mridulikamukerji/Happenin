@@ -5,6 +5,7 @@ import 'buddyfinder.dart';
 import 'chats.dart';
 import 'shorts.dart';
 import 'stories.dart'; // ✅ Import Stories page
+import 'aisassistant.dart'; // ✅ Import AI Assistant page
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -362,7 +363,12 @@ class _DashboardPageState extends State<DashboardPage> {
             bottom: math.max(MediaQuery.of(context).padding.bottom, 20),
             right: 30,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AiAssistantPage()),
+                );
+              },
               child: Container(
                 width: 64,
                 height: 64,
