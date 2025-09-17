@@ -4,8 +4,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'buddyfinder.dart';
 import 'chats.dart';
 import 'shorts.dart';
-import 'stories.dart'; // ✅ Import Stories page
-import 'aisassistant.dart'; // ✅ Import AI Assistant page
+import 'stories.dart'; 
+import 'aisassistant.dart';
+import 'foryou.dart'; // ✅ Import ForYouPage
+import 'dining.dart';
+import 'movies.dart';
+import 'events.dart';
+import 'activities.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -169,26 +174,61 @@ class _DashboardPageState extends State<DashboardPage> {
                     // Fixed Options
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
+                      children: [
                         OptionItem(
                           imagePath: "assets/images/for_you.png",
                           label: "For You",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const ForYouPage()),
+                            );
+                          },
                         ),
                         OptionItem(
                           imagePath: "assets/images/dining.png",
                           label: "Dining",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const DiningPage()),
+                            );
+                          },
                         ),
                         OptionItem(
                           imagePath: "assets/images/movies.png",
                           label: "Movies",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const MoviesPage()),
+                            );
+                          },
                         ),
                         OptionItem(
                           imagePath: "assets/images/events.png",
                           label: "Events",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const EventsPage()),
+                            );
+                          },
                         ),
                         OptionItem(
                           imagePath: "assets/images/activities.png",
                           label: "Activities",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const ActivitiesPage()),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -430,11 +470,13 @@ class _DashboardPageState extends State<DashboardPage> {
 class OptionItem extends StatefulWidget {
   final String imagePath;
   final String label;
+  final VoidCallback? onTap; // ✅ Added onTap
 
   const OptionItem({
     super.key,
     required this.imagePath,
     required this.label,
+    this.onTap,
   });
 
   @override
@@ -447,6 +489,7 @@ class _OptionItemState extends State<OptionItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: widget.onTap, // ✅ call navigation
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
