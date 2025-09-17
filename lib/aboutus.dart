@@ -26,7 +26,7 @@ class AboutUsPage extends StatelessWidget {
       "role": "Founder and CEO",
       "bio":
           "Nishika focuses on building vibrant communities, ensuring safety, inclusivity, and unforgettable shared experiences.",
-      "image": "assets/images/founder3.png",
+      "image": "assets/images/founder2.png",
     },
   ];
 
