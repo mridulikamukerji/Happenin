@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dashboard.dart';
+import 'main.dart'; // ✅ Import LoginPage
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -38,6 +39,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
   final List<String> _interests = ["Movies", "Food", "Travel", "Music", "Sports"];
   final List<String> _addresses = ["123 Main St", "456 Park Ave"]; // example addresses
 
+  // Gender
+  String? _selectedGender = "Man"; // Default selection
+
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
@@ -49,10 +53,25 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
+      if (_selectedGender == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select your gender")),
+        );
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile updated successfully")),
       );
     }
+  }
+
+  void _deleteAccount() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false, // ✅ Removes all previous routes
+    );
   }
 
   Widget _buildTextField(String label, TextEditingController controller,
@@ -168,6 +187,43 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   _buildTextField("Bio", _bioController),
                   const SizedBox(height: 16),
 
+                  // ✅ Gender Selection
+                  const Text(
+                    "Gender",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<String>(
+                          value: "Man",
+                          groupValue: _selectedGender,
+                          activeColor: Colors.purple,
+                          title: const Text("Man", style: TextStyle(color: Colors.white)),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile<String>(
+                          value: "Woman",
+                          groupValue: _selectedGender,
+                          activeColor: Colors.purple,
+                          title: const Text("Woman", style: TextStyle(color: Colors.white)),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
                   // Addresses input
                   Row(
                     children: [
@@ -202,7 +258,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Display addresses as vertical list with chip style
+                  // Display addresses
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -277,7 +333,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Display interests as horizontal chips
+                  // Display interests
                   SizedBox(
                     width: double.infinity,
                     child: SingleChildScrollView(
@@ -318,6 +374,26 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       onPressed: _saveProfile,
                       child: const Text(
                         "Save Changes",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Delete account button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: _deleteAccount,
+                      child: const Text(
+                        "Delete Account",
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),

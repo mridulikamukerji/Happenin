@@ -65,6 +65,11 @@ class _ChatScreenState extends State<ChatScreen> {
     _messages = List.from(widget.messages);
     _participants = List.from(widget.participants);
     _groupNameController.text = widget.chatName;
+
+    // ✅ Listen to changes in the group name and update AppBar immediately
+    _groupNameController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -335,6 +340,8 @@ class _ChatScreenState extends State<ChatScreen> {
                             hintStyle: const TextStyle(color: Colors.white54),
                           ),
                           onChanged: (val) {
+                            // ✅ Reflect changes immediately in AppBar
+                            setState(() {});
                             if (!_isGroupNameManuallyEdited) {
                               _isGroupNameManuallyEdited = true;
                             }
@@ -523,7 +530,7 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                _groupNameController.text,
+                _groupNameController.text, // ✅ reflects name changes immediately
                 style: const TextStyle(color: Colors.white, fontSize: 18),
                 overflow: TextOverflow.ellipsis,
               ),

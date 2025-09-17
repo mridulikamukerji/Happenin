@@ -17,6 +17,8 @@ class _AddOwnStoryPageState extends State<AddOwnStoryPage> {
   Color? _backgroundColor;
   String _caption = "";
 
+  Offset _captionPosition = const Offset(16, 100); // Initial position
+
   final List<Color> _backgroundOptions = [
     Colors.black,
     Colors.deepPurple,
@@ -103,6 +105,8 @@ class _AddOwnStoryPageState extends State<AddOwnStoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -111,8 +115,7 @@ class _AddOwnStoryPageState extends State<AddOwnStoryPage> {
           Positioned.fill(
             child: _mediaFile != null
                 ? (_isVideo
-                    ? (_videoController != null &&
-                            _videoController!.value.isInitialized
+                    ? (_videoController != null && _videoController!.value.isInitialized
                         ? VideoPlayer(_videoController!)
                         : const Center(child: CircularProgressIndicator()))
                     : Image.file(_mediaFile!, fit: BoxFit.cover))
@@ -145,25 +148,41 @@ class _AddOwnStoryPageState extends State<AddOwnStoryPage> {
             ),
           ),
 
-          // Caption box
+          // Draggable caption
           Positioned(
-            bottom: 100,
-            left: 16,
-            right: 16,
-            child: TextField(
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-              maxLines: 2,
-              decoration: InputDecoration(
-                hintText: "Write a caption...",
-                hintStyle: const TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.black45,
-                border: OutlineInputBorder(
+            left: _captionPosition.dx,
+            top: _captionPosition.dy,
+            child: GestureDetector(
+              onPanUpdate: (details) {
+                setState(() {
+                  double newX = _captionPosition.dx + details.delta.dx;
+                  double newY = _captionPosition.dy + details.delta.dy;
+
+                  // Keep caption within screen bounds
+                  newX = newX.clamp(0.0, screenSize.width - 250); // assume caption width ~250
+                  newY = newY.clamp(0.0, screenSize.height - 50); // assume caption height ~50
+
+                  _captionPosition = Offset(newX, newY);
+                });
+              },
+              child: Container(
+                width: 250,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black45,
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                ),
+                child: TextField(
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    hintText: "Write a caption...",
+                    hintStyle: TextStyle(color: Colors.white70),
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (val) => _caption = val,
                 ),
               ),
-              onChanged: (val) => _caption = val,
             ),
           ),
 

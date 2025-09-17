@@ -355,16 +355,24 @@ class _ChatsPageState extends State<ChatsPage> {
       backgroundColor: _slideColor,
       appBar: AppBar(
         backgroundColor: _slideColor,
-        leading: isSelectionMode
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  setState(() {
-                    selectedChats.clear();
-                  });
-                },
-              )
-            : null,
+        iconTheme: const IconThemeData(color: Colors.white), // ✅ white icons
+        leading: IconButton(
+  icon: const Icon(Icons.arrow_back),
+  onPressed: () {
+    if (isSelectionMode) {
+      setState(() {
+        selectedChats.clear();
+      });
+    } else {
+      // ✅ Always go back to Dashboard
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const DashboardPage()),
+      );
+    }
+  },
+),
+
         title: Text(
           isSelectionMode
               ? '${selectedChats.length} selected'
@@ -374,7 +382,7 @@ class _ChatsPageState extends State<ChatsPage> {
         actions: isSelectionMode
             ? [
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.white),
+                  icon: const Icon(Icons.delete),
                   onPressed: _deleteSelectedChats,
                 )
               ]

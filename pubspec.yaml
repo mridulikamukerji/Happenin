@@ -14,6 +14,8 @@ dependencies:
   video_player: ^2.8.3
   image_picker: ^0.8.7+5
   carousel_slider: ^5.0.0
+  google_maps_flutter: ^2.10.0
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -44,9 +46,9 @@ flutter:
     - assets/images/events.png
     - assets/images/for_you.png
     - assets/images/movies.png
-    - assets/images/slide1.png
-    - assets/images/slide2.png
-    - assets/images/slide3.png
+    - assets/images/openInvitesSlide.png
+    - assets/images/buddyFinderSlide.png
+    - assets/images/mapSlide.png
     - assets/images/spotlight1.png
     - assets/images/spotlight2.png
     - assets/images/spotlight3.png
@@ -62,6 +64,7 @@ flutter:
     - assets/images/founder1.png
     - assets/images/founder2.png
     - assets/images/founder3.png
+    - assets/images/purple_location_pin.png
 
 flutter_native_splash:
   android: true

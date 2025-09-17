@@ -8,55 +8,72 @@ class BuddyFinderPage extends StatefulWidget {
 }
 
 class _BuddyFinderPageState extends State<BuddyFinderPage> {
-  final List<Map<String, dynamic>> _buddies = [
+  final List<Map<String, dynamic>> _allBuddies = [
     {
       "image": "assets/images/buddy1.png",
       "name": "Eren Jaeger",
       "age": 19,
       "bio": "Passionate about freedom! Tatakae.",
-      "interests": ["War", "Genocide", "Revenge"]
+      "interests": ["War", "Genocide", "Revenge"],
+      "gender": "Man",
     },
     {
       "image": "assets/images/buddy2.png",
       "name": "Misa",
       "age": 26,
       "bio": "Done with red flags. In my self-love era!!",
-      "interests": ["Art", "Cafes", "Travel"]
+      "interests": ["Art", "Cafes", "Travel"],
+      "gender": "Woman",
     },
     {
       "image": "assets/images/buddy3.png",
       "name": "Sukuna",
       "age": 1000,
       "bio": "Proudly a black flag. Periodt.",
-      "interests": ["Mind Games", "Blackmail", "Cats"]
+      "interests": ["Mind Games", "Blackmail", "Cats"],
+      "gender": "Man",
     },
     {
       "image": "assets/images/buddy4.png",
       "name": "Yor",
       "age": 28,
       "bio": "Mommy for hire here! Can't cook but I'm good with a knife.",
-      "interests": ["Swords", "Assasin", "Goth"]
+      "interests": ["Swords", "Assasin", "Goth"],
+      "gender": "Woman",
     },
   ];
 
+  String _filter = "No Preferences"; // Default filter
   int _currentIndex = 0;
 
-  void _onSwipe(bool isAccepted) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  List<Map<String, dynamic>> get _filteredBuddies {
+    if (_filter == "Men Only") {
+      return _allBuddies.where((b) => b["gender"] == "Man").toList();
+    } else if (_filter == "Women Only") {
+      return _allBuddies.where((b) => b["gender"] == "Woman").toList();
+    }
+    return _allBuddies; // No Preferences
+  }
 
+  void _onSwipe(bool isAccepted) {
+    if (_currentIndex >= _filteredBuddies.length) return;
+
+    final currentBuddy = _filteredBuddies[_currentIndex];
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           isAccepted
-              ? "You liked ${_buddies[_currentIndex]['name']}!"
-              : "You skipped ${_buddies[_currentIndex]['name']}.",
+              ? "You liked ${currentBuddy['name']}!"
+              : "You skipped ${currentBuddy['name']}.",
         ),
         duration: const Duration(milliseconds: 900),
         behavior: SnackBarBehavior.floating,
       ),
     );
 
-    if (_currentIndex < _buddies.length - 1) {
+    if (_currentIndex < _filteredBuddies.length - 1) {
       setState(() {
         _currentIndex++;
       });
@@ -70,6 +87,7 @@ class _BuddyFinderPageState extends State<BuddyFinderPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final buddies = _filteredBuddies;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -92,52 +110,85 @@ class _BuddyFinderPageState extends State<BuddyFinderPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // This pushes everything below AppBar safely
               const SizedBox(height: 10),
 
-              Expanded(
-                child: Column(
-                  children: [
-                    // ✅ Instruction line right above slides
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        "Swipe left to skip   |   Swipe right to like",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+              // ✅ Toggle Buttons for Men Only / Women Only / No Preferences
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ToggleButtons(
+                  isSelected: [
+                    _filter == "Men Only",
+                    _filter == "Women Only",
+                    _filter == "No Preferences",
+                  ],
+                  onPressed: (index) {
+                    setState(() {
+                      if (index == 0) {
+                        _filter = "Men Only";
+                      } else if (index == 1) {
+                        _filter = "Women Only";
+                      } else {
+                        _filter = "No Preferences";
+                      }
+                      _currentIndex = 0; // reset to first
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  fillColor: const Color(0xFF5D2A84),
+                  selectedColor: Colors.white,
+                  color: Colors.white70,
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text("Men Only"),
                     ),
-                    Expanded(
-                      child: Center(
-                        child: _currentIndex < _buddies.length
-                            ? Draggable(
-                                onDragEnd: (details) {
-                                  if (details.offset.dx > 100) {
-                                    _onSwipe(true);
-                                  } else if (details.offset.dx < -100) {
-                                    _onSwipe(false);
-                                  }
-                                },
-                                feedback: Material(
-                                  type: MaterialType.transparency,
-                                  child:
-                                      _buildBuddyCard(_buddies[_currentIndex], size),
-                                ),
-                                childWhenDragging: Container(),
-                                child:
-                                    _buildBuddyCard(_buddies[_currentIndex], size),
-                              )
-                            : const Text(
-                                "No more buddies!",
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 18),
-                              ),
-                      ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text("Women Only"),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text("No Preferences"),
                     ),
                   ],
+                ),
+              ),
+
+              // ✅ Instruction line
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  "Swipe left to skip   |   Swipe right to like",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              Expanded(
+                child: Center(
+                  child: _currentIndex < buddies.length
+                      ? Draggable(
+                          onDragEnd: (details) {
+                            if (details.offset.dx > 100) {
+                              _onSwipe(true);
+                            } else if (details.offset.dx < -100) {
+                              _onSwipe(false);
+                            }
+                          },
+                          feedback: Material(
+                            type: MaterialType.transparency,
+                            child: _buildBuddyCard(buddies[_currentIndex], size),
+                          ),
+                          childWhenDragging: Container(),
+                          child: _buildBuddyCard(buddies[_currentIndex], size),
+                        )
+                      : const Text(
+                          "No more buddies!",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
                 ),
               ),
             ],
@@ -221,8 +272,8 @@ class _BuddyFinderPageState extends State<BuddyFinderPage> {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children:
-                            (buddy['interests'] as List<String>).map((interest) {
+                        children: (buddy['interests'] as List<String>)
+                            .map((interest) {
                           return Chip(
                             label: Text(interest),
                             backgroundColor: const Color(0xFF5D2A84),

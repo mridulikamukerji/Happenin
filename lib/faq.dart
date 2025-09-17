@@ -10,7 +10,7 @@ class FAQsPage extends StatelessWidget {
     {
       "question": "How do I create an account?",
       "answer":
-          "Tap on the Sign Up button on the login screen, enter your details, and verify your email to create an account."
+          "Tap on the Sign Up button on the login screen, enter your details and click on create an account."
     },
     {
       "question": "How do I reset my password?",
@@ -20,17 +20,17 @@ class FAQsPage extends StatelessWidget {
     {
       "question": "How do I book an event?",
       "answer":
-          "Go to the Events section, select the event you want, and tap on 'Book Now'. You can pay securely via multiple options."
+          "Go to the Events section, select the event you want, and tap on 'Book'. Change details according to your preferences and then click on pay to complete the booking."
     },
     {
       "question": "How do I block or unblock someone?",
       "answer":
-          "Open their profile, tap on the three-dot menu, and select 'Block'. To unblock, go to Blocked People in the sidebar."
+          "Open the chat of the person you want to block, tap on the info menu and select 'Block'. To unblock, go to Blocked People in the sidebar."
     },
     {
       "question": "How do I contact support?",
       "answer":
-          "Go to My Profile > Settings > Contact Support. You can chat with our team or raise a support ticket."
+          "Go to My Profile >  Contact Support. You can write directly to us. You may also ask our inbuilt AI assistant on the dashboard for guidance."
     },
   ];
 

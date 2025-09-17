@@ -16,6 +16,7 @@ class StoriesPage extends StatefulWidget {
 
 class _StoriesPageState extends State<StoriesPage> {
   int _currentFooterIndex = 0;
+  final Color _slideColor = const Color(0xFF2E0B5C);
 
   final List<Map<String, dynamic>> _participants = [
     {
@@ -25,12 +26,14 @@ class _StoriesPageState extends State<StoriesPage> {
         {
           "video": "assets/videos/story1.mp4",
           "bio": "Tatakae by passion. Cats by love.",
-          "isVideo": true
+          "isVideo": true,
+          "captionOffset": {"dx": 50.0, "dy": 200.0}, // Example saved offset
         },
         {
           "video": "assets/videos/story3.mp4",
           "bio": "I know I made your day. You're welcome :)",
-          "isVideo": true
+          "isVideo": true,
+          "captionOffset": {"dx": 100.0, "dy": 300.0},
         }
       ]
     },
@@ -41,13 +44,13 @@ class _StoriesPageState extends State<StoriesPage> {
         {
           "video": "assets/videos/story2.mp4",
           "bio": "Travelling is healing",
-          "isVideo": true
+          "isVideo": true,
+          "captionOffset": {"dx": 20.0, "dy": 150.0},
         }
       ]
     },
   ];
 
-  // ----------------- Add Story -----------------
   Future<void> _addOwnStory() async {
     final result = await Navigator.push(
       context,
@@ -55,13 +58,21 @@ class _StoriesPageState extends State<StoriesPage> {
     );
 
     if (result != null) {
-      setState(() {
-        // Remove old "You" story if exists
-        _participants.removeWhere((p) => p["name"] == "You");
+      // Check if user already exists
+      final existingIndex =
+          _participants.indexWhere((p) => p["name"] == "You");
 
-        // Insert at the top
+      if (existingIndex >= 0) {
+        // Append new story to existing user's stories
+        List existingStories = _participants[existingIndex]["stories"];
+        existingStories.addAll(result["stories"]);
+        _participants[existingIndex]["stories"] = existingStories;
+      } else {
+        // Add new user at top
         _participants.insert(0, result);
-      });
+      }
+
+      setState(() {});
     }
   }
 
@@ -100,9 +111,9 @@ class _StoriesPageState extends State<StoriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: _slideColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: _slideColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -130,7 +141,7 @@ class _StoriesPageState extends State<StoriesPage> {
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2E0B5C),
+                  color: _slideColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -154,7 +165,7 @@ class _StoriesPageState extends State<StoriesPage> {
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF2E0B5C),
+                color: _slideColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -194,7 +205,7 @@ class _StoriesPageState extends State<StoriesPage> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        color: Colors.black.withOpacity(0.6),
+        color: _slideColor.withOpacity(0.6),
         child: SafeArea(
           top: false,
           child: Row(
@@ -245,6 +256,7 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
   int _currentStoryIndex = 0;
   VideoPlayerController? _videoController;
   List<bool> _likedStories = [];
+  final Color _slideColor = const Color(0xFF2E0B5C);
 
   @override
   void initState() {
@@ -275,7 +287,6 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
         setState(() {});
       });
     } else {
-      // background-only story → wait 3s then go next
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) _onStoryComplete();
       });
@@ -314,7 +325,6 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
       return _videoController!.value.position.inMilliseconds /
           _videoController!.value.duration.inMilliseconds;
     } else {
-      // background or image → instant 100% when viewed
       if (index < _currentStoryIndex) return 1.0;
       if (index > _currentStoryIndex) return 0.0;
       return 1.0;
@@ -331,6 +341,7 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
   Widget build(BuildContext context) {
     final story = widget.participant["stories"][_currentStoryIndex];
     final paddingTop = MediaQuery.of(context).padding.top;
+    final screenSize = MediaQuery.of(context).size;
 
     Widget storyContent;
     if (story["isVideo"] == true && _videoController != null && _videoController!.value.isInitialized) {
@@ -338,16 +349,27 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
     } else if (story["video"] != null && File(story["video"]).existsSync()) {
       storyContent = Image.file(File(story["video"]), fit: BoxFit.cover);
     } else if (story["background"] != null) {
-      storyContent = Container(color: Color(story["background"]));
+      storyContent = Container(color: Color(story["background"])); 
     } else {
-      storyContent = const Center(child: Text("Story unavailable", style: TextStyle(color: Colors.white)));
+      storyContent = Center(
+        child: Text("Story unavailable",
+            style: TextStyle(color: Colors.white70)),
+      );
+    }
+
+    // Get saved caption position or default
+    Offset captionOffset = Offset(16, screenSize.height - 150);
+    if (story.containsKey("captionOffset")) {
+      final offsetMap = story["captionOffset"];
+      if (offsetMap != null) {
+        captionOffset = Offset(offsetMap["dx"], offsetMap["dy"]);
+      }
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: _slideColor,
       body: Stack(
         children: [
-          // Story Content
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTapDown: (details) {
@@ -360,8 +382,6 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
             },
             child: SizedBox.expand(child: storyContent),
           ),
-
-          // Progress bars
           Positioned(
             top: paddingTop + 8,
             left: 16,
@@ -387,8 +407,6 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
               }),
             ),
           ),
-
-          // Header row
           Positioned(
             top: paddingTop + 24,
             left: 8,
@@ -432,26 +450,21 @@ class _ParticipantStoriesViewState extends State<ParticipantStoriesView> {
               ],
             ),
           ),
-
-          // Caption
+          // Caption at saved position
           if (story["bio"] != null && story["bio"].toString().isNotEmpty)
             Positioned(
-              bottom: 50,
-              left: 16,
-              right: 16,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    color: Colors.black.withOpacity(0.5),
-                    child: Text(
-                      story["bio"],
-                      style:
-                          const TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
+              left: captionOffset.dx,
+              top: captionOffset.dy,
+              child: Container(
+                width: 250,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  story["bio"],
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
             ),

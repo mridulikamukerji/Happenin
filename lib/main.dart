@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:image_picker/image_picker.dart';
 
-// Import dashboard.dart
+// Import your other pages
 import 'dashboard.dart';
 
 late VideoPlayerController splashController;
@@ -11,6 +11,7 @@ late VideoPlayerController splashController;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize splash video
   splashController =
       VideoPlayerController.asset('assets/videos/splash_screen.mp4');
   await splashController.initialize();
@@ -26,6 +27,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'Happenin',
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
       home: VideoSplashScreen(nextScreen: const LoginPage()),
     );
   }
@@ -66,9 +69,9 @@ class VideoSplashScreen extends StatelessWidget {
   }
 }
 
-// -------------------------
-// LOGIN PAGE
-// -------------------------
+/// -------------------------
+/// LOGIN PAGE
+/// -------------------------
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -78,6 +81,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -99,18 +104,18 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     "Login",
                     style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   const SizedBox(height: 40),
 
                   // Username field
                   TextField(
+                    controller: _usernameController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      labelText: "Username",
+                      labelText: "Username / Email",
                       labelStyle: const TextStyle(color: Colors.white70),
                       filled: true,
                       fillColor: Colors.black.withOpacity(0.4),
@@ -124,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Password field
                   TextField(
+                    controller: _passwordController,
                     obscureText: _obscurePassword,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
@@ -150,9 +156,22 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
 
-                  // Login button → Navigate to Dashboard
+                  // Forgot Password
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => _showForgotPasswordDialog(context),
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Login button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -165,6 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       onPressed: () {
+                        // Navigate to Dashboard
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -176,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 25),
 
-                  // Sign Up button → navigates to SignUpPage
+                  // Sign Up button
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
@@ -194,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
                               builder: (_) => const SignUpPage()),
                         );
                       },
-                      child: const Text("Sign Up with Email"),
+                      child: const Text("Sign Up"),
                     ),
                   ),
                 ],
@@ -202,6 +222,110 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showForgotPasswordDialog(BuildContext parentContext) {
+    final TextEditingController emailController = TextEditingController();
+    showDialog(
+      context: parentContext,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.black87,
+        title: const Text("Forgot Password?",
+            style: TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: emailController,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: "Enter your registered email",
+            hintStyle: TextStyle(color: Colors.white54),
+            filled: true,
+            fillColor: Colors.black45,
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(parentContext),
+            child:
+                const Text("Cancel", style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              bool emailExists = false; // Simulate check
+              Navigator.pop(parentContext);
+              if (emailExists) {
+                _showOtpDialog(parentContext, emailController.text.trim());
+              } else {
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  const SnackBar(
+                    content: Text("Email not registered"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child:
+                const Text("Send OTP", style: TextStyle(color: Colors.purple)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOtpDialog(BuildContext parentContext, String email) {
+    final TextEditingController otpController = TextEditingController();
+    showDialog(
+      context: parentContext,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.black87,
+        title: const Text("Enter OTP", style: TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: otpController,
+          keyboardType: TextInputType.number,
+          maxLength: 6,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: "6-digit OTP",
+            hintStyle: TextStyle(color: Colors.white54),
+            filled: true,
+            fillColor: Colors.black45,
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(parentContext),
+            child:
+                const Text("Cancel", style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              String enteredOtp = otpController.text.trim();
+              bool isOtpValid = enteredOtp.length == 6;
+              if (isOtpValid) {
+                Navigator.pop(parentContext);
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  const SnackBar(
+                    content: Text("OTP Verified! You can login now."),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  const SnackBar(
+                    content: Text("Invalid OTP. Try again."),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child:
+                const Text("Verify", style: TextStyle(color: Colors.purple)),
+          ),
+        ],
       ),
     );
   }
@@ -235,11 +359,13 @@ class _SignUpPageState extends State<SignUpPage> {
 
   // Lists
   final List<String> _interests = [];
-  final List<String> _addresses = []; // ✅ dynamic addresses
+  final List<String> _addresses = [];
+
+  // Gender
+  String? _selectedGender;
 
   Future<void> _pickImage() async {
-    final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
         _profileImage = File(image.path);
@@ -248,6 +374,16 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUpSuccess(BuildContext context) {
+    if (_selectedGender == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select your gender"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final userProfile = UserProfile(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       firstName: _firstNameController.text.trim(),
@@ -257,7 +393,8 @@ class _SignUpPageState extends State<SignUpPage> {
       interests: _interests,
       profileImageUrl: _profileImage?.path ?? "",
       phoneNumber: _phoneController.text.trim(),
-      address: _addresses.join(', '), // ✅ combine multiple addresses
+      address: _addresses.join(', '),
+      gender: _selectedGender!,
     );
 
     debugPrint("UserProfile created: ${userProfile.toMap()}");
@@ -323,16 +460,61 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 20),
                   _buildTextField("Last Name", controller: _lastNameController),
                   const SizedBox(height: 20),
-                  _buildTextField("Email", controller: _emailController, keyboardType: TextInputType.emailAddress),
+                  _buildTextField("Email",
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress),
                   const SizedBox(height: 20),
-                  _buildTextField("Phone Number", controller: _phoneController, keyboardType: TextInputType.phone),
+                  _buildTextField("Phone Number",
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone),
+                  const SizedBox(height: 20),
+
+                  // Gender selection
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Gender",
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile<String>(
+                              value: "Woman",
+                              groupValue: _selectedGender,
+                              onChanged: (value) {
+                                setState(() => _selectedGender = value);
+                              },
+                              title: const Text("Woman",
+                                  style: TextStyle(color: Colors.white)),
+                              activeColor: Colors.purple,
+                            ),
+                          ),
+                          Expanded(
+                            child: RadioListTile<String>(
+                              value: "Man",
+                              groupValue: _selectedGender,
+                              onChanged: (value) {
+                                setState(() => _selectedGender = value);
+                              },
+                              title: const Text("Man",
+                                  style: TextStyle(color: Colors.white)),
+                              activeColor: Colors.purple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 20),
 
                   // Address input
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTextField("Add Address", controller: _addressController),
+                        child: _buildTextField("Add Address",
+                            controller: _addressController),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add, color: Colors.white),
@@ -359,7 +541,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 12),
                           decoration: BoxDecoration(
                             color: Colors.purple,
                             borderRadius: BorderRadius.circular(20),
@@ -368,7 +551,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                child: Text(address, style: const TextStyle(color: Colors.white)),
+                                child: Text(address,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
                               ),
                               GestureDetector(
                                 onTap: () {
@@ -376,7 +561,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                     _addresses.removeAt(index);
                                   });
                                 },
-                                child: const Icon(Icons.close, color: Colors.white),
+                                child:
+                                    const Icon(Icons.close, color: Colors.white),
                               ),
                             ],
                           ),
@@ -387,14 +573,17 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 20),
 
                   // Password field
-                  _buildPasswordField("Password", _obscurePassword, () {
+                  _buildPasswordField(
+                      "Password", _obscurePassword, () {
                     setState(() {
                       _obscurePassword = !_obscurePassword;
                     });
                   }, _passwordController),
                   const SizedBox(height: 20),
 
-                  _buildTextField("Age", controller: _ageController, keyboardType: TextInputType.number),
+                  _buildTextField("Age",
+                      controller: _ageController,
+                      keyboardType: TextInputType.number),
                   const SizedBox(height: 20),
                   _buildTextField("Bio", controller: _bioController),
                   const SizedBox(height: 20),
@@ -402,13 +591,16 @@ class _SignUpPageState extends State<SignUpPage> {
                   // Interests input
                   Row(
                     children: [
-                      Expanded(child: _buildTextField("Add Interest", controller: _interestController)),
+                      Expanded(
+                          child: _buildTextField("Add Interest",
+                              controller: _interestController)),
                       IconButton(
                         icon: const Icon(Icons.add, color: Colors.white),
                         onPressed: () {
                           if (_interestController.text.isNotEmpty) {
                             setState(() {
-                              _interests.add(_interestController.text.trim());
+                              _interests
+                                  .add(_interestController.text.trim());
                               _interestController.clear();
                             });
                           }
@@ -421,10 +613,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: _interests.map((interest) => Chip(
-                      label: Text(interest, style: const TextStyle(color: Colors.white)),
-                      backgroundColor: Colors.purple,
-                    )).toList(),
+                    children: _interests
+                        .map((interest) => Chip(
+                              label: Text(interest,
+                                  style:
+                                      const TextStyle(color: Colors.white)),
+                              backgroundColor: Colors.purple,
+                            ))
+                        .toList(),
                   ),
                   const SizedBox(height: 30),
 
@@ -524,6 +720,7 @@ class UserProfile {
   final String profileImageUrl;
   final String phoneNumber;
   final String address;
+  final String gender; // ✅ Added gender
 
   UserProfile({
     required this.id,
@@ -535,6 +732,7 @@ class UserProfile {
     required this.profileImageUrl,
     required this.phoneNumber,
     required this.address,
+    required this.gender,
   });
 
   Map<String, dynamic> toMap() {
@@ -548,6 +746,7 @@ class UserProfile {
       'profileImageUrl': profileImageUrl,
       'phoneNumber': phoneNumber,
       'address': address,
+      'gender': gender,
     };
   }
 
@@ -562,6 +761,7 @@ class UserProfile {
       profileImageUrl: map['profileImageUrl'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
       address: map['address'] ?? '',
+      gender: map['gender'] ?? '',
     );
   }
 }

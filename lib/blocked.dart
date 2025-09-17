@@ -13,17 +13,14 @@ class _BlockedPeoplePageState extends State<BlockedPeoplePage> {
   final List<Map<String, String>> _blockedUsers = [
     {
       "name": "Alice Johnson",
-      "reason": "Spamming in chats",
       "image": "assets/images/profile_placeholder.png",
     },
     {
       "name": "Rahul Mehta",
-      "reason": "Offensive messages",
       "image": "assets/images/profile_placeholder.png",
     },
     {
       "name": "Sophia Lee",
-      "reason": "Fake account",
       "image": "assets/images/profile_placeholder.png",
     },
   ];
@@ -37,8 +34,16 @@ class _BlockedPeoplePageState extends State<BlockedPeoplePage> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("$userName has been unblocked"),
-        backgroundColor: Colors.green,
+        content: Text(
+          "$userName has been unblocked",
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF2E0B5C), // Dark purple
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -120,10 +125,6 @@ class _BlockedPeoplePageState extends State<BlockedPeoplePage> {
                                 user["name"]!,
                                 style: const TextStyle(
                                     color: Colors.white, fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Text(
-                                user["reason"]!,
-                                style: const TextStyle(color: Colors.white70),
                               ),
                               trailing: ElevatedButton(
                                 style: ElevatedButton.styleFrom(

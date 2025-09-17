@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:happenin/aboutus.dart';
 import 'package:happenin/blocked.dart';
+import 'package:happenin/contactus.dart';
 import 'package:happenin/faq.dart';
 import 'package:happenin/main.dart';
 import 'package:happenin/pastoutings.dart';
@@ -17,7 +18,10 @@ import 'movies.dart';
 import 'events.dart';
 import 'activities.dart';
 import 'booking.dart';
-import 'myprofile.dart'; // ✅ Import MyProfile page
+import 'myprofile.dart';
+import 'upcoming_outings.dart';
+import 'open_invites.dart'; // ✅ added
+import 'maps.dart';        // ✅ added
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -35,15 +39,15 @@ class _DashboardPageState extends State<DashboardPage> {
   final Color _slideColor = const Color(0xFF2E0B5C);
 
   final List<String> _headings = [
-    "Trending Now",
-    "Recommended for You",
-    "Nearby Offers",
+    "Open Invites",
+    "Find your Buddies",
+    "Map of Events",
   ];
 
   final List<String> _carouselImages = [
-    "assets/images/slide1.png",
-    "assets/images/slide2.png",
-    "assets/images/slide3.png",
+    "assets/images/openInvitesSlide.png",
+    "assets/images/buddyFinderSlide.png",
+    "assets/images/mapSlide.png",
   ];
 
   final List<Map<String, String>> _spotlightItems = [
@@ -85,76 +89,88 @@ class _DashboardPageState extends State<DashboardPage> {
       extendBodyBehindAppBar: true,
       appBar: null,
 
-      // ✅ Sidebar Drawer (Right side)
-endDrawer: Drawer(
-  backgroundColor: _slideColor, // <-- change from Colors.black87 to dark purple
-  child: ListView(
-    padding: EdgeInsets.zero,
-    children: [
-      DrawerHeader(
-        decoration: BoxDecoration(color: _slideColor), // also dark purple
-        child: Column(
+      // ✅ Sidebar Drawer
+      endDrawer: Drawer(
+        backgroundColor: _slideColor,
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            const CircleAvatar(
-              radius: 40,
-              backgroundImage:
-                  AssetImage("assets/images/profile_placeholder.png"),
+            DrawerHeader(
+              decoration: BoxDecoration(color: _slideColor),
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 40,
+                    backgroundImage:
+                        AssetImage("assets/images/profile_placeholder.png"),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "User Name",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            const Text(
-              "User Name",
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
+            _buildDrawerItem(Icons.person, "My Profile", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MyProfilePage()),
+              );
+            }),
+            _buildDrawerItem(Icons.person, "Upcoming Outings", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UpcomingOutingsPage()),
+              );
+            }),
+            _buildDrawerItem(Icons.history, "Past Outings", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PastOutingsPage()),
+              );
+            }),
+            _buildDrawerItem(Icons.block, "Blocked People", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BlockedPeoplePage()),
+              );
+            }),
+            _buildDrawerItem(Icons.help, "FAQs", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FAQsPage()),
+              );
+            }),
+            _buildDrawerItem(Icons.info, "About Us", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutUsPage()),
+              );
+            }),
+            _buildDrawerItem(Icons.contact_mail, "Contact Us", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ContactUsPage()),
+              );
+            }),
+            _buildDrawerItem(Icons.logout, "Log Out", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+              );
+            }),
           ],
         ),
       ),
-      // Drawer items remain the same
-      _buildDrawerItem(Icons.person, "My Profile", onTap: () {
-        Navigator.pop(context); // close drawer
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const MyProfilePage()),
-        );
-      }),
-      _buildDrawerItem(Icons.history, "Past Outings", onTap: () {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PastOutingsPage()),
-        );
-      }),
-      _buildDrawerItem(Icons.block, "Blocked People", onTap: () {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const BlockedPeoplePage()),
-        );
-      }),
-      _buildDrawerItem(Icons.help, "FAQs", onTap: () {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const FAQsPage()),
-        );
-      }),
-      _buildDrawerItem(Icons.info, "About Us", onTap: () {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const AboutUsPage()),
-        );
-      }),
-      _buildDrawerItem(Icons.logout, "Log Out", onTap: () {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-        );
-      }),
-    ],
-  ),
-),
-
 
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -259,7 +275,6 @@ endDrawer: Drawer(
                       ),
                       const SizedBox(height: 16),
 
-                      // ✅ Rest of your UI
                       _buildMainContent(context),
                     ],
                   ),
@@ -314,12 +329,12 @@ endDrawer: Drawer(
       title: Text(title, style: const TextStyle(color: Colors.white)),
       onTap: onTap ??
           () {
-            Navigator.pop(context); // closes drawer
+            Navigator.pop(context);
           },
     );
   }
 
-  // Main content (unchanged)
+  // Main content
   Widget _buildMainContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -338,10 +353,8 @@ endDrawer: Drawer(
               borderSide: BorderSide.none,
             ),
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 12,
-            ),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
           ),
         ),
         const SizedBox(height: 12),
@@ -440,32 +453,22 @@ endDrawer: Drawer(
             return GestureDetector(
               onTap: () {
                 if (index == 0) {
+                  // ✅ Open Invites
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const BookingPage(
-                        title: "Arijit Singh Concert",
-                        image: "assets/images/slide1.png",
-                        description:
-                            "Join us for a night of soulful, life-changing songs with Arijit Singh.",
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (_) => const OpenInvitesPage()),
                   );
                 } else if (index == 1) {
+                  // ✅ Buddy Finder
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const BuddyFinderPage()),
                   );
                 } else if (index == 2) {
+                  // ✅ Maps Page
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const BookingPage(
-                        title: "Sushi's R Us",
-                        image: "assets/images/slide3.png",
-                        description: "Enjoy delectable, world-famous sushi here.",
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (_) => const MapsPage()),
                   );
                 }
               },
@@ -547,8 +550,8 @@ endDrawer: Drawer(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12)),
+                        borderRadius:
+                            const BorderRadius.vertical(top: Radius.circular(12)),
                         child: Image.asset(
                           item["image"]!,
                           fit: BoxFit.cover,
