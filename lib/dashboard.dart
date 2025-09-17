@@ -56,6 +56,20 @@ class _DashboardPageState extends State<DashboardPage> {
     },
   ];
 
+  // ✅ Dummy Indian addresses
+  final List<String> _locations = [
+    "Mumbai, Maharashtra - 400001",
+    "Delhi, Connaught Place - 110001",
+    "Bangalore, MG Road - 560001",
+    "Chennai, T Nagar - 600017",
+    "Hyderabad, Banjara Hills - 500034",
+    "Pune, FC Road - 411005",
+    "Kolkata, Park Street - 700016",
+    "Jaipur, MI Road - 302001",
+  ];
+
+  String _selectedLocation = "Mumbai, Maharashtra - 400001"; // Default
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,6 +114,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       body: Stack(
         children: [
+          // Background
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -117,27 +132,35 @@ class _DashboardPageState extends State<DashboardPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            ClipOval(
-                              child: SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: Image.asset(
-                                  "assets/images/location_pin.png",
-                                  fit: BoxFit.cover,
+                        GestureDetector(
+                          onTap: () {
+                            _showLocationDropdown(context);
+                          },
+                          child: Row(
+                            children: [
+                              ClipOval(
+                                child: SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: Image.asset(
+                                    "assets/images/location_pin.png",
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              "Your Location",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
+                              const SizedBox(width: 8),
+                              Text(
+                                _selectedLocation,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                              const Icon(Icons.arrow_drop_down,
+                                  color: Colors.white),
+                            ],
+                          ),
                         ),
                         const CircleAvatar(
                           radius: 20,
@@ -271,12 +294,39 @@ class _DashboardPageState extends State<DashboardPage> {
 
                         return GestureDetector(
                           onTap: () {
-                            if (index == 1) {
+                            if (index == 0) {
+                              // Slide 1 → BookingPage
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
+                                  builder: (_) => const BookingPage(
+                                    title: "Arijit Singh Concert",
+                                    image: "assets/images/slide1.png",
+                                    description:
+                                        "Join us for a night of soulful, life-changing songs with Arijit Singh.",
+                                  ),
+                                ),
+                              );
+                            } else if (index == 1) {
+                              // Slide 2 → BuddyFinder
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
                                         const BuddyFinderPage()),
+                              );
+                            } else if (index == 2) {
+                              // Slide 3 → BookingPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const BookingPage(
+                                    title: "Sushi's R Us",
+                                    image: "assets/images/slide3.png",
+                                    description:
+                                        "Enjoy delectable, world-famous sushi here.",
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -452,6 +502,50 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  // ✅ Location Dropdown with selected item always on top
+  void _showLocationDropdown(BuildContext context) {
+    final List<String> reorderedLocations = [
+      _selectedLocation,
+      ..._locations.where((loc) => loc != _selectedLocation),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.black87,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: reorderedLocations.length,
+          itemBuilder: (context, index) {
+            final location = reorderedLocations[index];
+            final isSelected = location == _selectedLocation;
+            return ListTile(
+              title: Text(
+                location,
+                style: TextStyle(
+                  color: isSelected ? Colors.purpleAccent : Colors.white,
+                  fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              tileColor:
+                  isSelected ? Colors.white12 : Colors.transparent,
+              onTap: () {
+                setState(() {
+                  _selectedLocation = location;
+                });
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   // Footer Item
   Widget _buildFooterItem(IconData icon, String label, int index,
       {VoidCallback? onTap}) {
@@ -485,7 +579,7 @@ class _DashboardPageState extends State<DashboardPage> {
 class OptionItem extends StatefulWidget {
   final String imagePath;
   final String label;
-  final VoidCallback? onTap; // ✅ Added onTap
+  final VoidCallback? onTap;
 
   const OptionItem({
     super.key,
@@ -504,7 +598,7 @@ class _OptionItemState extends State<OptionItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap, // ✅ call navigation
+      onTap: widget.onTap,
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
