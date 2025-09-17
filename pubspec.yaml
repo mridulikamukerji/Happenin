@@ -52,6 +52,9 @@ flutter:
     - assets/videos/story1.mp4
     - assets/videos/story2.mp4
     - assets/videos/story3.mp4
+    - assets/images/founder1.png
+    - assets/images/founder2.png
+    - assets/images/founder3.png
 
 flutter_native_splash:
   android: true

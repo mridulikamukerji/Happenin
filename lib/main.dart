@@ -252,7 +252,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _interestController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController(); // ✅ phone
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController(); // ✅ address
   final List<String> _interests = [];
 
   Future<void> _pickImage() async {
@@ -274,7 +275,8 @@ class _SignUpPageState extends State<SignUpPage> {
       bio: _bioController.text.trim(),
       interests: _interests,
       profileImageUrl: _profileImage?.path ?? "",
-      phoneNumber: _phoneController.text.trim(), // ✅ added
+      phoneNumber: _phoneController.text.trim(),
+      address: _addressController.text.trim(), // ✅ added
     );
 
     debugPrint("UserProfile created: ${userProfile.toMap()}");
@@ -358,9 +360,15 @@ class _SignUpPageState extends State<SignUpPage> {
                           const SizedBox(height: 20),
 
                           // Phone
-                          _buildTextField("Phone Number", // ✅ added
+                          _buildTextField("Phone Number",
                               controller: _phoneController,
                               keyboardType: TextInputType.phone),
+                          const SizedBox(height: 20),
+
+                          // Address ✅
+                          _buildTextField("Address",
+                              controller: _addressController,
+                              keyboardType: TextInputType.streetAddress),
                           const SizedBox(height: 20),
 
                           // Password
@@ -527,7 +535,8 @@ class UserProfile {
   final String bio;
   final List<String> interests;
   final String profileImageUrl;
-  final String phoneNumber; // ✅ added
+  final String phoneNumber;
+  final String address; // ✅ added
 
   UserProfile({
     required this.id,
@@ -538,6 +547,7 @@ class UserProfile {
     required this.interests,
     required this.profileImageUrl,
     required this.phoneNumber,
+    required this.address,
   });
 
   Map<String, dynamic> toMap() {
@@ -549,7 +559,8 @@ class UserProfile {
       'bio': bio,
       'interests': interests,
       'profileImageUrl': profileImageUrl,
-      'phoneNumber': phoneNumber, // ✅ added
+      'phoneNumber': phoneNumber,
+      'address': address, // ✅ added
     };
   }
 
@@ -562,7 +573,8 @@ class UserProfile {
       bio: map['bio'] ?? '',
       interests: List<String>.from(map['interests'] ?? []),
       profileImageUrl: map['profileImageUrl'] ?? '',
-      phoneNumber: map['phoneNumber'] ?? '', // ✅ added
+      phoneNumber: map['phoneNumber'] ?? '',
+      address: map['address'] ?? '', // ✅ added
     );
   }
 }
