@@ -39,7 +39,7 @@ class _DashboardPageState extends State<DashboardPage> {
   final Color _slideColor = const Color(0xFF2E0B5C);
 
   final List<String> _headings = [
-    "Open Invites",
+    "Invites",
     "Find your Buddies",
     "Map of Events",
   ];
@@ -172,42 +172,48 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
 
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        color: Colors.black.withOpacity(0.6),
-        child: SafeArea(
-          top: false,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
-                setState(() => _currentFooterIndex = 0);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const StoriesPage()),
-                );
-              }),
-              _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
-                setState(() => _currentFooterIndex = 1);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ChatsPage()),
-                );
-              }),
-              _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
-                setState(() => _currentFooterIndex = 2);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ShortsPage()),
-                );
-              }),
-              _buildFooterItem(Icons.home, "Home", 3, onTap: () {
-                setState(() => _currentFooterIndex = 3);
-              }),
-            ],
-          ),
-        ),
+      bottomNavigationBar: SafeArea(
+  top: false,
+  child: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+    decoration: BoxDecoration(
+      color: Colors.black.withOpacity(0.7),
+      border: const Border(
+        top: BorderSide(color: Colors.white24, width: 0.5),
       ),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
+          setState(() => _currentFooterIndex = 0);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const StoriesPage()),
+          );
+        }),
+        _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
+          setState(() => _currentFooterIndex = 1);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const ChatsPage()),
+          );
+        }),
+        _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
+          setState(() => _currentFooterIndex = 2);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const ShortsPage()),
+          );
+        }),
+        _buildFooterItem(Icons.home, "Home", 3, onTap: () {
+          setState(() => _currentFooterIndex = 3);
+        }),
+      ],
+    ),
+  ),
+),
+
 
       body: Builder(
         builder: (context) => Stack(
@@ -453,19 +459,16 @@ class _DashboardPageState extends State<DashboardPage> {
             return GestureDetector(
               onTap: () {
                 if (index == 0) {
-                  // ✅ Open Invites
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const OpenInvitesPage()),
                   );
                 } else if (index == 1) {
-                  // ✅ Buddy Finder
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const BuddyFinderPage()),
                   );
                 } else if (index == 2) {
-                  // ✅ Maps Page
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const MapsPage()),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'booking.dart'; // ✅ Import your BookingPage
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -58,22 +57,14 @@ class _PaymentPageState extends State<PaymentPage> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const BookingPage(
-                    title: "Booking",
-                    image: "assets/images/spotlight1.png",
-                    description: "Back to booking page",
-                  ),
-                ),
-              );
+              Navigator.of(context).pop(); // Close dialog
+              Navigator.pop(context, isSuccess); 
+              // ✅ This returns result to the previous page instead of forcing booking.dart
             },
             child: const Text(
               'OK',
               style: TextStyle(
-                color: Colors.white, // ✅ White button text
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),

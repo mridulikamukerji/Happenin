@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:math';
 
 // Import your other pages
 import 'dashboard.dart';
@@ -160,15 +161,16 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Forgot Password
                   Align(
-                    alignment: Alignment.centerRight,
+                    alignment: Alignment.center,
                     child: TextButton(
-                      onPressed: () => _showForgotPasswordDialog(context),
-                      child: const Text(
-                        "Forgot Password?",
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    ),
+                    onPressed: () => _showForgotPasswordDialog(context),
+                    child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(color: Colors.white70),
                   ),
+                ),
+              ),
+
                   const SizedBox(height: 20),
 
                   // Login button
@@ -331,9 +333,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// -------------------------
-// SIGN UP PAGE
-// -------------------------
+/// -------------------------
+/// SIGN UP PAGE
+/// -------------------------
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -364,6 +366,10 @@ class _SignUpPageState extends State<SignUpPage> {
   // Gender
   String? _selectedGender;
 
+  // Phone verification
+  String _generatedOtp = "123456"; // Dummy OTP
+  bool _isPhoneVerified = false;
+
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -373,11 +379,113 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  void _sendOtpToPhone() {
+    if (_phoneController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter your phone number first."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    debugPrint("Sending OTP $_generatedOtp to ${_phoneController.text.trim()}");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("OTP sent to ${_phoneController.text.trim()} (simulated)."),
+        backgroundColor: Colors.purple,
+      ),
+    );
+
+    _showPhoneVerificationDialog(context);
+  }
+
+  void _showPhoneVerificationDialog(BuildContext context) {
+    final TextEditingController otpController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.black87,
+        title: const Text("Verify Phone Number",
+            style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "An OTP has been sent to your phone number.",
+              style: TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: otpController,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: "Enter 6-digit OTP",
+                hintStyle: TextStyle(color: Colors.white54),
+                filled: true,
+                fillColor: Colors.black45,
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                const Text("Cancel", style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (otpController.text.trim() == _generatedOtp) {
+                setState(() {
+                  _isPhoneVerified = true;
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Phone number verified successfully!"),
+                    backgroundColor: Colors.purple,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Invalid OTP. Try again."),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child:
+                const Text("Verify", style: TextStyle(color: Colors.purple)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _signUpSuccess(BuildContext context) {
     if (_selectedGender == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please select your gender"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (!_isPhoneVerified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please verify your phone number before signing up"),
           backgroundColor: Colors.red,
         ),
       );
@@ -399,10 +507,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     debugPrint("UserProfile created: ${userProfile.toMap()}");
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-    );
+    Navigator.pop(context); // Back to login after signup
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Account successfully created!"),
@@ -464,19 +569,42 @@ class _SignUpPageState extends State<SignUpPage> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress),
                   const SizedBox(height: 20),
+
+                  // Phone field
                   _buildTextField("Phone Number",
                       controller: _phoneController,
                       keyboardType: TextInputType.phone),
+                  const SizedBox(height: 10),
+
+                  // Verify Phone button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: _isPhoneVerified ? null : _sendOtpToPhone,
+                      child: Text(
+                        _isPhoneVerified
+                            ? "Phone Verified"
+                            : "Verify Phone Number",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
 
                   // Gender selection
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Gender",
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
+                      const Text("Gender",
+                          style: TextStyle(color: Colors.white70, fontSize: 16)),
                       Row(
                         children: [
                           Expanded(
@@ -552,8 +680,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             children: [
                               Expanded(
                                 child: Text(address,
-                                    style:
-                                        const TextStyle(color: Colors.white)),
+                                    style: const TextStyle(color: Colors.white)),
                               ),
                               GestureDetector(
                                 onTap: () {
@@ -573,8 +700,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 20),
 
                   // Password field
-                  _buildPasswordField(
-                      "Password", _obscurePassword, () {
+                  _buildPasswordField("Password", _obscurePassword, () {
                     setState(() {
                       _obscurePassword = !_obscurePassword;
                     });
@@ -599,8 +725,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         onPressed: () {
                           if (_interestController.text.isNotEmpty) {
                             setState(() {
-                              _interests
-                                  .add(_interestController.text.trim());
+                              _interests.add(_interestController.text.trim());
                               _interestController.clear();
                             });
                           }
@@ -642,12 +767,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 20),
 
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginPage()),
-                      );
-                    },
+                    onPressed: () => Navigator.pop(context),
                     child: const Text(
                       "Already have an account? Login here",
                       style: TextStyle(color: Colors.white70),
@@ -707,9 +827,9 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 }
 
-// -------------------------
-// USER PROFILE MODEL
-// -------------------------
+/// -------------------------
+/// USER PROFILE MODEL
+/// -------------------------
 class UserProfile {
   final String id;
   final String firstName;
@@ -720,7 +840,7 @@ class UserProfile {
   final String profileImageUrl;
   final String phoneNumber;
   final String address;
-  final String gender; // ✅ Added gender
+  final String gender;
 
   UserProfile({
     required this.id,
