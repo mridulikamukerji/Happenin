@@ -228,50 +228,101 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _showForgotPasswordDialog(BuildContext parentContext) {
+    void _showForgotPasswordDialog(BuildContext parentContext) {
     final TextEditingController emailController = TextEditingController();
+
     showDialog(
       context: parentContext,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.black87,
-        title: const Text("Forgot Password?",
-            style: TextStyle(color: Colors.white)),
-        content: TextField(
-          controller: emailController,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: "Enter your registered email",
-            hintStyle: TextStyle(color: Colors.white54),
-            filled: true,
-            fillColor: Colors.black45,
-            border: OutlineInputBorder(),
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.black.withOpacity(0.9),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.lock_reset, size: 60, color: Colors.purple),
+              const SizedBox(height: 15),
+              const Text(
+                "Forgot Password?",
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Enter your registered email to receive an OTP",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 20),
+
+              // Email field
+              TextField(
+                controller: emailController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: "Enter your email",
+                  hintStyle: const TextStyle(color: Colors.white54),
+                  filled: true,
+                  fillColor: Colors.white12,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        const BorderSide(color: Colors.white38, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        const BorderSide(color: Colors.purple, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(parentContext),
+                    child: const Text("Cancel",
+                        style: TextStyle(color: Colors.white70)),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                    ),
+                    onPressed: () {
+                      bool emailExists = false; // Simulate check
+                      Navigator.pop(parentContext);
+                      if (emailExists) {
+                        _showOtpDialog(parentContext, emailController.text.trim());
+                      } else {
+                        ScaffoldMessenger.of(parentContext).showSnackBar(
+                          const SnackBar(
+                            content: Text("Email not registered"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text("Send OTP"),
+                  ),
+                ],
+              )
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(parentContext),
-            child:
-                const Text("Cancel", style: TextStyle(color: Colors.white70)),
-          ),
-          TextButton(
-            onPressed: () {
-              bool emailExists = false; // Simulate check
-              Navigator.pop(parentContext);
-              if (emailExists) {
-                _showOtpDialog(parentContext, emailController.text.trim());
-              } else {
-                ScaffoldMessenger.of(parentContext).showSnackBar(
-                  const SnackBar(
-                    content: Text("Email not registered"),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            child:
-                const Text("Send OTP", style: TextStyle(color: Colors.purple)),
-          ),
-        ],
       ),
     );
   }
@@ -367,7 +418,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String? _selectedGender;
 
   // Phone verification
-  String _generatedOtp = "123456"; // Dummy OTP
+  final String _generatedOtp = "123456"; // Dummy OTP
   bool _isPhoneVerified = false;
 
   Future<void> _pickImage() async {
