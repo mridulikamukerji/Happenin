@@ -14,16 +14,22 @@ class _ForYouPageState extends State<ForYouPage> {
       "image": "assets/images/spotlight1.png",
       "title": "Music Festival",
       "description": "Experience live performances this weekend!",
+      "date": "2025-10-10",
+      "time": "18:00",
     },
     {
       "image": "assets/images/spotlight2.png",
       "title": "Art Exhibition",
       "description": "Explore modern art from top creators.",
+      "date": "2025-10-12",
+      "time": "10:00",
     },
     {
       "image": "assets/images/spotlight3.png",
       "title": "Food Carnival",
       "description": "Taste cuisines from around the world.",
+      "date": "2025-10-15",
+      "time": "12:00",
     },
   ];
 
@@ -54,8 +60,10 @@ class _ForYouPageState extends State<ForYouPage> {
                 image: item["image"]!,
                 title: item["title"]!,
                 description: item["description"]!,
+                date: item["date"]!,
+                time: item["time"]!,
                 onBook: () {
-                  // ✅ Navigate to booking page
+                  // ✅ Navigate to booking page with date & time
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -63,6 +71,8 @@ class _ForYouPageState extends State<ForYouPage> {
                         title: item["title"]!,
                         image: item["image"]!,
                         description: item["description"]!,
+                        date: item["date"]!,
+                        time: item["time"]!,
                       ),
                     ),
                   );
@@ -80,12 +90,16 @@ class _EventCard extends StatelessWidget {
   final String image;
   final String title;
   final String description;
+  final String date;
+  final String time;
   final VoidCallback onBook;
 
   const _EventCard({
     required this.image,
     required this.title,
     required this.description,
+    required this.date,
+    required this.time,
     required this.onBook,
   });
 
@@ -93,7 +107,7 @@ class _EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2E0B5C).withOpacity(0.9), // add opacity for readability
+        color: const Color(0xFF2E0B5C).withOpacity(0.9), // background with opacity
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -134,6 +148,15 @@ class _EventCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "Date: $date  |  Time: $time",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
                 const SizedBox(height: 12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dashboard.dart'; // ✅ To navigate back
+import 'booking.dart';  // ✅ Import booking page
 
 class UpcomingOutingsPage extends StatelessWidget {
   const UpcomingOutingsPage({super.key});
@@ -147,6 +148,36 @@ class UpcomingOutingsPage extends StatelessWidget {
                                   style: const TextStyle(
                                     color: Colors.white70,
                                     fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                // View Button
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepPurpleAccent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => BookingPage(
+                                            title: outing["title"]!,
+                                            description: outing["description"]!,
+                                            date: outing["date"]!,
+                                            time: outing["time"]!,
+                                            image: outing["image"]!,
+                                            preConfirmed: true, // ✅ show confirmed booking
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text("View",
+                                        style: TextStyle(color: Colors.white)),
                                   ),
                                 ),
                               ],

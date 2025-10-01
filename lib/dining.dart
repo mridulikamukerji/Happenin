@@ -14,16 +14,22 @@ class _DiningPageState extends State<DiningPage> {
       "image": "assets/images/spotlight1.png",
       "title": "Music Festival",
       "description": "Experience live performances this weekend!",
+      "date": "Oct 5, 2025",
+      "time": "7:30 PM",
     },
     {
       "image": "assets/images/spotlight2.png",
       "title": "Art Exhibition",
       "description": "Explore modern art from top creators.",
+      "date": "Oct 12, 2025",
+      "time": "12:00 PM",
     },
     {
       "image": "assets/images/spotlight3.png",
       "title": "Food Carnival",
       "description": "Taste cuisines from around the world.",
+      "date": "Oct 20, 2025",
+      "time": "1:00 PM",
     },
   ];
 
@@ -54,6 +60,8 @@ class _DiningPageState extends State<DiningPage> {
                 image: item["image"]!,
                 title: item["title"]!,
                 description: item["description"]!,
+                date: item["date"]!,
+                time: item["time"]!,
                 onBook: () {
                   // ✅ Navigate to booking page
                   Navigator.push(
@@ -63,6 +71,8 @@ class _DiningPageState extends State<DiningPage> {
                         title: item["title"]!,
                         image: item["image"]!,
                         description: item["description"]!,
+                        date: item["date"]!,
+                        time: item["time"]!,
                       ),
                     ),
                   );
@@ -80,12 +90,16 @@ class _DiningCard extends StatelessWidget {
   final String image;
   final String title;
   final String description;
+  final String date;
+  final String time;
   final VoidCallback onBook;
 
   const _DiningCard({
     required this.image,
     required this.title,
     required this.description,
+    required this.date,
+    required this.time,
     required this.onBook,
   });
 
@@ -135,6 +149,24 @@ class _DiningCard extends StatelessWidget {
                     fontSize: 14,
                     color: Colors.white70,
                   ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today, size: 14, color: Colors.white70),
+                    const SizedBox(width: 6),
+                    Text(
+                      date,
+                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                    const SizedBox(width: 16),
+                    const Icon(Icons.access_time, size: 14, color: Colors.white70),
+                    const SizedBox(width: 6),
+                    Text(
+                      time,
+                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 Align(

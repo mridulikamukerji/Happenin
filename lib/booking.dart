@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
-import 'payment.dart'; 
+import 'payment.dart';
 
 class BookingPage extends StatefulWidget {
   final String title;
   final String image;
   final String description;
+  final String date; // ✅ Added
+  final String time; // ✅ Added
+  final bool preConfirmed; // ✅ NEW
 
   const BookingPage({
     super.key,
     required this.title,
     required this.image,
     required this.description,
+    required this.date,
+    required this.time,
+    this.preConfirmed = false, // ✅ default is false
   });
 
   @override
@@ -21,8 +27,7 @@ class _BookingPageState extends State<BookingPage> {
   DateTime? _selectedDateTime;
   bool _bookingConfirmed = false; // ✅ Track booking status
 
-  final DateTime _scheduledEventDateTime =
-      DateTime(2025, 12, 25, 18, 0);
+  late final DateTime _scheduledEventDateTime; // ✅ Parsed from widget.date & time
 
   final List<Map<String, dynamic>> _allParticipants = [
     {
@@ -55,6 +60,43 @@ class _BookingPageState extends State<BookingPage> {
 
   int get _peopleCount => 1 + _selectedParticipants.length;
 
+  @override
+  void initState() {
+    super.initState();
+    // ✅ Parse date & time into DateTime
+    try {
+      final dateParts = widget.date.split(" "); // e.g. "25 Sep 2025"
+      final day = int.parse(dateParts[0]);
+      final month = _monthNumber(dateParts[1]);
+      final year = int.parse(dateParts[2]);
+
+      final timeParts = widget.time.split(":");
+      int hour;
+      int minute;
+      if (widget.time.contains("AM") || widget.time.contains("PM")) {
+        final parts = widget.time.split(" ");
+        final hm = parts[0].split(":");
+        hour = int.parse(hm[0]);
+        minute = int.parse(hm[1]);
+        if (parts[1] == "PM" && hour < 12) hour += 12;
+        if (parts[1] == "AM" && hour == 12) hour = 0;
+      } else {
+        hour = int.parse(timeParts[0]);
+        minute = int.parse(timeParts[1]);
+      }
+
+      _scheduledEventDateTime = DateTime(year, month, day, hour, minute);
+    } catch (e) {
+      _scheduledEventDateTime = DateTime.now();
+    }
+
+    // ✅ Auto-confirm booking if preConfirmed = true
+    if (widget.preConfirmed) {
+      _bookingConfirmed = true;
+      _selectedDateTime = _scheduledEventDateTime;
+    }
+  }
+
   Future<void> _pickDateTime() async {
     final DateTime now = DateTime.now();
 
@@ -73,9 +115,7 @@ class _BookingPageState extends State<BookingPage> {
               onSurface: Colors.white,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-              ),
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
             ),
             dialogTheme: DialogThemeData(backgroundColor: Colors.grey[900]),
           ),
@@ -96,9 +136,7 @@ class _BookingPageState extends State<BookingPage> {
               dialHandColor: Color(0xFF2E0B5C),
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-              ),
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
             ),
           ),
           child: child!,
@@ -119,8 +157,7 @@ class _BookingPageState extends State<BookingPage> {
     if (chosenDateTime.isBefore(_scheduledEventDateTime)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content:
-                Text("You cannot book before the scheduled event date/time.")),
+            content: Text("You cannot book before the scheduled event date/time.")),
       );
       return;
     }
@@ -131,9 +168,8 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   void _showParticipantPicker() {
-    final available = _allParticipants
-        .where((p) => !_selectedParticipants.contains(p))
-        .toList();
+    final available =
+        _allParticipants.where((p) => !_selectedParticipants.contains(p)).toList();
 
     if (available.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -228,14 +264,14 @@ class _BookingPageState extends State<BookingPage> {
       MaterialPageRoute(builder: (_) => const PaymentPage()),
     ).then((success) {
       if (success == true) {
+        setState(() {
+          _bookingConfirmed = true;
+        });
+
         final dateStr =
             "${_selectedDateTime!.year}-${_selectedDateTime!.month.toString().padLeft(2, '0')}-${_selectedDateTime!.day.toString().padLeft(2, '0')}";
         final timeStr =
             "${_selectedDateTime!.hour.toString().padLeft(2, '0')}:${_selectedDateTime!.minute.toString().padLeft(2, '0')}";
-
-        setState(() {
-          _bookingConfirmed = true; // ✅ Mark booking as confirmed
-        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -249,6 +285,7 @@ class _BookingPageState extends State<BookingPage> {
     });
   }
 
+  // ✅ Cancel booking → redirect to PaymentPage for cancellation fee
   void _cancelBooking() {
     showDialog(
       context: context,
@@ -264,7 +301,7 @@ class _BookingPageState extends State<BookingPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // ✅ Close dialog
+            onPressed: () => Navigator.pop(context),
             child: const Text("Changed my mind"),
           ),
           ElevatedButton(
@@ -274,10 +311,28 @@ class _BookingPageState extends State<BookingPage> {
             ),
             onPressed: () {
               Navigator.pop(context); // close dialog
+
+              // ✅ Go to PaymentPage for cancellation fee
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const PaymentPage()),
-              );
+              ).then((success) {
+                if (success == true) {
+                  // Reset booking state only after successful cancellation fee payment
+                  setState(() {
+                    _bookingConfirmed = false;
+                    _selectedDateTime = null;
+                    _selectedParticipants.clear();
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          "Booking cancelled. Rs. 80 cancellation fee successfully paid."),
+                    ),
+                  );
+                }
+              });
             },
             child: const Text("Pay Cancellation Fee"),
           ),
@@ -343,8 +398,8 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                   const SizedBox(height: 15),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
@@ -419,15 +474,14 @@ class _BookingPageState extends State<BookingPage> {
                                   style: const TextStyle(color: Colors.white),
                                 ),
                                 backgroundColor: const Color(0xFF2E0B5C),
-                                deleteIcon: const Icon(Icons.close,
-                                    color: Colors.white),
+                                deleteIcon:
+                                    const Icon(Icons.close, color: Colors.white),
                                 onDeleted: () => _removeParticipant(p),
                               ))
                           .toList(),
                     )
                   ],
                   const SizedBox(height: 20),
-                  // First: Select Date Button
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -449,7 +503,6 @@ class _BookingPageState extends State<BookingPage> {
                     onPressed: _pickDateTime,
                   ),
                   const SizedBox(height: 20),
-                  // Then: Pay Now Button
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -468,7 +521,6 @@ class _BookingPageState extends State<BookingPage> {
                     onPressed: _goToPayment,
                   ),
                   const SizedBox(height: 20),
-                  // ✅ Cancel Booking Button (only visible when booking confirmed)
                   if (_bookingConfirmed)
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -513,5 +565,23 @@ class _BookingPageState extends State<BookingPage> {
       "Dec"
     ];
     return months[month];
+  }
+
+  int _monthNumber(String shortMonth) {
+    const map = {
+      "Jan": 1,
+      "Feb": 2,
+      "Mar": 3,
+      "Apr": 4,
+      "May": 5,
+      "Jun": 6,
+      "Jul": 7,
+      "Aug": 8,
+      "Sep": 9,
+      "Oct": 10,
+      "Nov": 11,
+      "Dec": 12,
+    };
+    return map[shortMonth] ?? 1;
   }
 }

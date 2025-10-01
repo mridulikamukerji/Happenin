@@ -55,16 +55,22 @@ class _DashboardPageState extends State<DashboardPage> {
       "image": "assets/images/spotlight1.png",
       "title": "Music Festival",
       "description": "Experience live performances this weekend!",
+      "date": "Oct 15, 2025",
+      "time": "7:00 PM",
     },
     {
       "image": "assets/images/spotlight2.png",
       "title": "Art Exhibition",
       "description": "Explore modern art from top creators.",
+      "date": "Oct 20, 2025",
+      "time": "11:00 AM",
     },
     {
       "image": "assets/images/spotlight3.png",
       "title": "Food Carnival",
       "description": "Taste cuisines from around the world.",
+      "date": "Oct 25, 2025",
+      "time": "5:30 PM",
     },
   ];
 
@@ -173,47 +179,46 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
 
       bottomNavigationBar: SafeArea(
-  top: false,
-  child: Container(
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-    decoration: BoxDecoration(
-      color: Colors.black.withOpacity(0.7),
-      border: const Border(
-        top: BorderSide(color: Colors.white24, width: 0.5),
+        top: false,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            border: const Border(
+              top: BorderSide(color: Colors.white24, width: 0.5),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
+                setState(() => _currentFooterIndex = 0);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const StoriesPage()),
+                );
+              }),
+              _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
+                setState(() => _currentFooterIndex = 1);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ChatsPage()),
+                );
+              }),
+              _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
+                setState(() => _currentFooterIndex = 2);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ShortsPage()),
+                );
+              }),
+              _buildFooterItem(Icons.home, "Home", 3, onTap: () {
+                setState(() => _currentFooterIndex = 3);
+              }),
+            ],
+          ),
+        ),
       ),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildFooterItem(Icons.auto_stories, "Stories", 0, onTap: () {
-          setState(() => _currentFooterIndex = 0);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const StoriesPage()),
-          );
-        }),
-        _buildFooterItem(Icons.chat_bubble, "Chats", 1, onTap: () {
-          setState(() => _currentFooterIndex = 1);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const ChatsPage()),
-          );
-        }),
-        _buildFooterItem(Icons.video_collection, "Shorts", 2, onTap: () {
-          setState(() => _currentFooterIndex = 2);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const ShortsPage()),
-          );
-        }),
-        _buildFooterItem(Icons.home, "Home", 3, onTap: () {
-          setState(() => _currentFooterIndex = 3);
-        }),
-      ],
-    ),
-  ),
-),
-
 
       body: Builder(
         builder: (context) => Stack(
@@ -539,6 +544,8 @@ class _DashboardPageState extends State<DashboardPage> {
                         title: item["title"]!,
                         image: item["image"]!,
                         description: item["description"]!,
+                        date: item["date"]!,
+                        time: item["time"]!,
                       ),
                     ),
                   );
