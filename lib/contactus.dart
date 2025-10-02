@@ -54,8 +54,26 @@ class _ContactUsPageState extends State<ContactUsPage> {
           borderSide: BorderSide(color: _primaryColor, width: 2),
         ),
       ),
-      validator: (val) =>
-          val == null || val.isEmpty ? "$label cannot be empty" : null,
+      validator: (val) {
+        if (val == null || val.trim().isEmpty) {
+          return "$label cannot be empty";
+        }
+        if (label == "Email") {
+          // Simple email regex
+          final emailRegex = RegExp(
+              r"^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$");
+          if (!emailRegex.hasMatch(val.trim())) {
+            return "Enter a valid email address";
+          }
+        }
+        if (label == "Subject" && val.trim().length < 3) {
+          return "Subject must be at least 3 characters";
+        }
+        if (label == "Message" && val.trim().length < 10) {
+          return "Message must be at least 10 characters";
+        }
+        return null;
+      },
     );
   }
 

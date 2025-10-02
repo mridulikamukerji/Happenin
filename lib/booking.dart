@@ -7,6 +7,8 @@ class BookingPage extends StatefulWidget {
   final String description;
   final String date; // ✅ Added
   final String time; // ✅ Added
+  final String venue; // ✅ NEW → venue
+  final double price; // ✅ price per person
   final bool preConfirmed; // ✅ NEW
 
   const BookingPage({
@@ -16,7 +18,9 @@ class BookingPage extends StatefulWidget {
     required this.description,
     required this.date,
     required this.time,
-    this.preConfirmed = false, // ✅ default is false
+    required this.venue, // ✅ required venue
+    required this.price,
+    this.preConfirmed = false,
   });
 
   @override
@@ -25,9 +29,9 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   DateTime? _selectedDateTime;
-  bool _bookingConfirmed = false; // ✅ Track booking status
+  bool _bookingConfirmed = false;
 
-  late final DateTime _scheduledEventDateTime; // ✅ Parsed from widget.date & time
+  late final DateTime _scheduledEventDateTime;
 
   final List<Map<String, dynamic>> _allParticipants = [
     {
@@ -63,14 +67,12 @@ class _BookingPageState extends State<BookingPage> {
   @override
   void initState() {
     super.initState();
-    // ✅ Parse date & time into DateTime
     try {
       final dateParts = widget.date.split(" "); // e.g. "25 Sep 2025"
       final day = int.parse(dateParts[0]);
       final month = _monthNumber(dateParts[1]);
       final year = int.parse(dateParts[2]);
 
-      final timeParts = widget.time.split(":");
       int hour;
       int minute;
       if (widget.time.contains("AM") || widget.time.contains("PM")) {
@@ -81,6 +83,7 @@ class _BookingPageState extends State<BookingPage> {
         if (parts[1] == "PM" && hour < 12) hour += 12;
         if (parts[1] == "AM" && hour == 12) hour = 0;
       } else {
+        final timeParts = widget.time.split(":");
         hour = int.parse(timeParts[0]);
         minute = int.parse(timeParts[1]);
       }
@@ -90,7 +93,6 @@ class _BookingPageState extends State<BookingPage> {
       _scheduledEventDateTime = DateTime.now();
     }
 
-    // ✅ Auto-confirm booking if preConfirmed = true
     if (widget.preConfirmed) {
       _bookingConfirmed = true;
       _selectedDateTime = _scheduledEventDateTime;
@@ -157,7 +159,8 @@ class _BookingPageState extends State<BookingPage> {
     if (chosenDateTime.isBefore(_scheduledEventDateTime)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("You cannot book before the scheduled event date/time.")),
+          content: Text("You cannot book before the scheduled event date/time."),
+        ),
       );
       return;
     }
@@ -285,7 +288,6 @@ class _BookingPageState extends State<BookingPage> {
     });
   }
 
-  // ✅ Cancel booking → redirect to PaymentPage for cancellation fee
   void _cancelBooking() {
     showDialog(
       context: context,
@@ -310,15 +312,12 @@ class _BookingPageState extends State<BookingPage> {
               foregroundColor: Colors.white,
             ),
             onPressed: () {
-              Navigator.pop(context); // close dialog
-
-              // ✅ Go to PaymentPage for cancellation fee
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const PaymentPage()),
               ).then((success) {
                 if (success == true) {
-                  // Reset booking state only after successful cancellation fee payment
                   setState(() {
                     _bookingConfirmed = false;
                     _selectedDateTime = null;
@@ -394,6 +393,24 @@ class _BookingPageState extends State<BookingPage> {
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "Venue: ${widget.venue}", // ✅ Show venue
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "₹${widget.price.toStringAsFixed(2)} per person",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
                     ),
                   ),
                   const SizedBox(height: 15),

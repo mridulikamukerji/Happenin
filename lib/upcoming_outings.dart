@@ -6,27 +6,33 @@ class UpcomingOutingsPage extends StatelessWidget {
   const UpcomingOutingsPage({super.key});
 
   // Dummy data for upcoming outings
-  final List<Map<String, String>> _upcomingOutings = const [
+  final List<Map<String, dynamic>> _upcomingOutings = const [
     {
       "image": "assets/images/spotlight1.png",
       "title": "Beach Party",
       "description": "Get ready for a fun-filled evening at the beach!",
       "date": "25 Sep 2025",
-      "time": "5:00 PM"
+      "time": "5:00 PM",
+      "venue": "Juhu Beach, Mumbai",
+      "price": 499.0, // ✅ Added price
     },
     {
       "image": "assets/images/spotlight2.png",
       "title": "Stand-up Comedy Night",
       "description": "Laugh out loud with the best comedians in town.",
       "date": "30 Sep 2025",
-      "time": "8:30 PM"
+      "time": "8:30 PM",
+      "venue": "Blue Frog, Lower Parel",
+      "price": 299.0, // ✅ Added price
     },
     {
       "image": "assets/images/spotlight3.png",
       "title": "Adventure Trek",
       "description": "Join us for an unforgettable mountain trek adventure.",
       "date": "05 Oct 2025",
-      "time": "6:00 AM"
+      "time": "6:00 AM",
+      "venue": "Sahyadri Hills, Lonavala",
+      "price": 799.0, // ✅ Added price
     },
   ];
 
@@ -162,16 +168,19 @@ class UpcomingOutingsPage extends StatelessWidget {
                                       ),
                                     ),
                                     onPressed: () {
+                                      // ✅ Navigate to booking page with pre-confirmed outing
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => BookingPage(
                                             title: outing["title"]!,
+                                            image: outing["image"]!,
                                             description: outing["description"]!,
                                             date: outing["date"]!,
                                             time: outing["time"]!,
-                                            image: outing["image"]!,
-                                            preConfirmed: true, // ✅ show confirmed booking
+                                            price: outing["price"], // ✅ Pass price
+                                            venue: outing["venue"]!,
+                                            preConfirmed: true, // ✅ indicates already booked
                                           ),
                                         ),
                                       );

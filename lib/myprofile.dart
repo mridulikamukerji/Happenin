@@ -37,7 +37,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   // Dummy existing interests & addresses
   final List<String> _interests = ["Movies", "Food", "Travel", "Music", "Sports"];
-  final List<String> _addresses = ["123 Main St", "456 Park Ave"]; // example addresses
+  final List<String> _addresses = ["123 Main St", "456 Park Ave"];
 
   // Gender
   String? _selectedGender = "Man"; // Default selection
@@ -70,17 +70,20 @@ class _MyProfilePageState extends State<MyProfilePage> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginPage()),
-      (route) => false, // ✅ Removes all previous routes
+      (route) => false,
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
+  // ✅ Reusable validator-based field builder
+  Widget _buildValidatedField(
+      String label, TextEditingController controller, String? Function(String?)? validator,
       {bool obscureText = false,
       TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      validator: validator,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
@@ -96,7 +99,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
           borderSide: BorderSide(color: _primaryColor, width: 2),
         ),
       ),
-      validator: (val) => val == null || val.isEmpty ? "$label cannot be empty" : null,
     );
   }
 
@@ -143,7 +145,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Profile picture centered
+                  // Profile picture
                   Center(
                     child: GestureDetector(
                       onTap: _pickImage,
@@ -171,23 +173,59 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Editable fields
-                  _buildTextField("First Name", _firstNameController),
-                  const SizedBox(height: 16),
-                  _buildTextField("Last Name", _lastNameController),
-                  const SizedBox(height: 16),
-                  _buildTextField("Email", _emailController, keyboardType: TextInputType.emailAddress),
-                  const SizedBox(height: 16),
-                  _buildTextField("Phone Number", _phoneController, keyboardType: TextInputType.phone),
-                  const SizedBox(height: 16),
-                  _buildTextField("Password", _passwordController, obscureText: true),
-                  const SizedBox(height: 16),
-                  _buildTextField("Age", _ageController, keyboardType: TextInputType.number),
-                  const SizedBox(height: 16),
-                  _buildTextField("Bio", _bioController),
+                  // Editable fields with validations
+                  _buildValidatedField("First Name", _firstNameController,
+                      (v) => v == null || v.isEmpty ? "Enter first name" : null),
                   const SizedBox(height: 16),
 
-                  // ✅ Gender Selection
+                  _buildValidatedField("Last Name", _lastNameController,
+                      (v) => v == null || v.isEmpty ? "Enter last name" : null),
+                  const SizedBox(height: 16),
+
+                  _buildValidatedField("Email", _emailController, (v) {
+                    if (v == null || v.isEmpty) return "Enter email";
+                    final emailRegex =
+                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                    if (!emailRegex.hasMatch(v)) return "Enter valid email";
+                    return null;
+                  }, keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 16),
+
+                  _buildValidatedField("Phone Number", _phoneController, (v) {
+                    if (v == null || v.isEmpty) return "Enter phone number";
+                    if (!RegExp(r'^\d{10}$').hasMatch(v)) {
+                      return "Phone number must be exactly 10 digits";
+                    }
+                    return null;
+                  }, keyboardType: TextInputType.phone),
+                  const SizedBox(height: 16),
+
+                  _buildValidatedField("Password", _passwordController, (v) {
+                    if (v == null || v.isEmpty) return "Enter password";
+                    if (v.length < 8) return "Password must be at least 8 characters";
+                    if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$')
+                        .hasMatch(v)) {
+                      return "Must contain letters and numbers";
+                    }
+                    return null;
+                  }, obscureText: true),
+                  const SizedBox(height: 16),
+
+                  _buildValidatedField("Age", _ageController, (v) {
+                    if (v == null || v.isEmpty) return "Enter age";
+                    final age = int.tryParse(v);
+                    if (age == null || age <= 0 || age > 120) {
+                      return "Enter valid age";
+                    }
+                    return null;
+                  }, keyboardType: TextInputType.number),
+                  const SizedBox(height: 16),
+
+                  _buildValidatedField("Bio", _bioController,
+                      (v) => v == null || v.isEmpty ? "Enter bio" : null),
+                  const SizedBox(height: 16),
+
+                  // ✅ Gender
                   const Text(
                     "Gender",
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -247,10 +285,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         icon: const Icon(Icons.add, color: Colors.white),
                         onPressed: () {
                           if (_addressController.text.isNotEmpty) {
-                            setState(() {
-                              _addresses.add(_addressController.text.trim());
-                              _addressController.clear();
-                            });
+                            final newAddress = _addressController.text.trim();
+                            if (!_addresses.contains(newAddress)) {
+                              setState(() {
+                                _addresses.add(newAddress);
+                                _addressController.clear();
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Address already exists")),
+                              );
+                            }
                           }
                         },
                       )
@@ -322,10 +367,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         icon: const Icon(Icons.add, color: Colors.white),
                         onPressed: () {
                           if (_interestController.text.isNotEmpty) {
-                            setState(() {
-                              _interests.add(_interestController.text.trim());
-                              _interestController.clear();
-                            });
+                            final newInterest = _interestController.text.trim();
+                            if (!_interests.contains(newInterest)) {
+                              setState(() {
+                                _interests.add(newInterest);
+                                _interestController.clear();
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Interest already exists")),
+                              );
+                            }
                           }
                         },
                       )

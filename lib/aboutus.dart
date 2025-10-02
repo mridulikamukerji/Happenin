@@ -12,21 +12,21 @@ class AboutUsPage extends StatelessWidget {
       "role": "Founder and CEO",
       "bio":
           "Mridulika is passionate about connecting people through unique experiences. She drives the overall vision and strategy of HappenIn.",
-      "image": "assets/images/founder1.png",
+      "image": "assets/images/founders/founder1.png",
     },
     {
       "name": "Atharva Naik",
       "role": "Founder and CEO",
       "bio":
           "Atharva is the brains behind the platform’s technology. He ensures HappenIn runs smoothly and scales to millions of users.",
-      "image": "assets/images/founder2.png",
+      "image": "assets/images/founders/founder2.png",
     },
     {
       "name": "Nishika Shah",
       "role": "Founder and CEO",
       "bio":
           "Nishika focuses on building vibrant communities, ensuring safety, inclusivity, and unforgettable shared experiences.",
-      "image": "assets/images/founder3.png",
+      "image": "assets/images/founders/founder3.png",
     },
   ];
 

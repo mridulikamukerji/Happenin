@@ -11,25 +11,43 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   final List<Map<String, String>> _eventItems = [
     {
-      "image": "assets/images/spotlight1.png",
-      "title": "Music Festival",
-      "description": "Experience live performances this weekend!",
-      "date": "Oct 10, 2025",
-      "time": "6:00 PM",
+      "image": "assets/images/events/music1.png",
+      "title": "The Sound of Tomorrow (TSOT)",
+      "description":
+          "Mumbai’s most anticipated underground music festival returns — and it’s bigger, bolder and louder than ever.",
+      "date": "Oct 5, 2025",
+      "time": "5:00 PM",
+      "venue": "NSCI Dome, Worli",
+      "price": "2000", // 💰 Added
     },
     {
-      "image": "assets/images/spotlight2.png",
-      "title": "Art Exhibition",
-      "description": "Explore modern art from top creators.",
-      "date": "Oct 15, 2025",
-      "time": "11:00 AM",
+      "image": "assets/images/events/music2.png",
+      "title": "Epitome presents- Madhur Sharma Live",
+      "description":
+          "Get ready for a magical night filled with soulful music, celebratory vibes, and the signature Epitome experience. It’s more than a party – it’s a musical celebration of a milestone.",
+      "date": "Oct 4, 2025",
+      "time": "10:00 PM",
+      "venue": "Blue Frog, Lower Parel",
+      "price": "1500", // 💰 Added
     },
     {
-      "image": "assets/images/spotlight3.png",
-      "title": "Food Carnival",
-      "description": "Taste cuisines from around the world.",
-      "date": "Oct 20, 2025",
-      "time": "1:00 PM",
+      "image": "assets/images/events/music3.png",
+      "title": "Papon | Shaam-E-Mehfil",
+      "description":
+          "Shaam-E-Mehfil is a performance presented by Papon with his band of super talented musicians of this country.",
+      "date": "Oct 11, 2025",
+      "time": "8:00 PM",
+      "venue": "NCPA, Mumbai",
+      "price": "1800", // 💰 Added
+    },
+    {
+      "image": "assets/images/events/sports1.png",
+      "title": "India VS New Zealand - ICC Women's CWC 2025",
+      "description": "India takes on New Zealand in a critical match!!",
+      "date": "Oct 23, 2025",
+      "time": "3:00 PM",
+      "venue": "Wankhede Stadium, Mumbai",
+      "price": "1200", // 💰 Added
     },
   ];
 
@@ -62,8 +80,10 @@ class _EventsPageState extends State<EventsPage> {
                 description: item["description"]!,
                 date: item["date"]!,
                 time: item["time"]!,
+                venue: item["venue"]!,
+                price: item["price"]!,
                 onBook: () {
-                  // ✅ Navigate to booking page with full details
+                  // ✅ Navigate to booking page with price
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -73,6 +93,8 @@ class _EventsPageState extends State<EventsPage> {
                         description: item["description"]!,
                         date: item["date"]!,
                         time: item["time"]!,
+                        venue: item["venue"]!,
+                        price: double.tryParse(item["price"] ?? "0") ?? 0,
                       ),
                     ),
                   );
@@ -92,6 +114,8 @@ class _EventCard extends StatelessWidget {
   final String description;
   final String date;
   final String time;
+  final String price;
+  final String venue;
   final VoidCallback onBook;
 
   const _EventCard({
@@ -100,6 +124,8 @@ class _EventCard extends StatelessWidget {
     required this.description,
     required this.date,
     required this.time,
+    required this.price,
+    required this.venue,
     required this.onBook,
   });
 
@@ -107,7 +133,7 @@ class _EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2E0B5C).withOpacity(0.9), // background with opacity
+        color: const Color(0xFF2E0B5C).withOpacity(0.9),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -153,20 +179,33 @@ class _EventCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, size: 14, color: Colors.white70),
+                    const Icon(Icons.calendar_today,
+                        size: 14, color: Colors.white70),
                     const SizedBox(width: 6),
                     Text(
                       date,
-                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 13),
                     ),
                     const SizedBox(width: 16),
-                    const Icon(Icons.access_time, size: 14, color: Colors.white70),
+                    const Icon(Icons.access_time,
+                        size: 14, color: Colors.white70),
                     const SizedBox(width: 6),
                     Text(
                       time,
-                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 13),
                     ),
                   ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "₹$price per person", // 💰 Show price
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.amber,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Align(

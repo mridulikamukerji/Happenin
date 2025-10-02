@@ -18,10 +18,11 @@ import 'movies.dart';
 import 'events.dart';
 import 'activities.dart';
 import 'booking.dart';
+import 'diningbooking.dart'; // ✅ Dining booking page
 import 'myprofile.dart';
 import 'upcoming_outings.dart';
-import 'open_invites.dart'; // ✅ added
-import 'maps.dart';        // ✅ added
+import 'open_invites.dart';
+import 'maps.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -45,47 +46,64 @@ class _DashboardPageState extends State<DashboardPage> {
   ];
 
   final List<String> _carouselImages = [
-    "assets/images/openInvitesSlide.png",
-    "assets/images/buddyFinderSlide.png",
-    "assets/images/mapSlide.png",
+    "assets/images/carousel_images/openInvitesSlide.png",
+    "assets/images/carousel_images/buddyFinderSlide.png",
+    "assets/images/carousel_images/mapSlide.png",
   ];
 
   final List<Map<String, String>> _spotlightItems = [
-    {
-      "image": "assets/images/spotlight1.png",
-      "title": "Music Festival",
-      "description": "Experience live performances this weekend!",
-      "date": "Oct 15, 2025",
-      "time": "7:00 PM",
-    },
-    {
-      "image": "assets/images/spotlight2.png",
-      "title": "Art Exhibition",
-      "description": "Explore modern art from top creators.",
-      "date": "Oct 20, 2025",
-      "time": "11:00 AM",
-    },
-    {
-      "image": "assets/images/spotlight3.png",
-      "title": "Food Carnival",
-      "description": "Taste cuisines from around the world.",
-      "date": "Oct 25, 2025",
-      "time": "5:30 PM",
-    },
-  ];
+  {
+    "image": "assets/images/events/music1.png",
+    "title": "The Sound of Tomorrow (TSOT)",
+    "description": "Mumbai’s most anticipated underground music festival returns — and it’s bigger, bolder and louder than ever.",
+    "date": "Oct 5, 2025",
+    "time": "5:00 PM",
+    "venue": "NSCI Dome, Worli",
+    "price": "2000", // 💰 Added
+  },
+  {
+    "image": "assets/images/dining/dining4.png",
+    "title": "All Saints",
+    "description": "Famous for leaving a lasting impression...",
+    "venue": "Linking Road, Bandra",
+    "price": "800", // 💰 Added
+  },
+  {
+    "image": "assets/images/movies/movies4.png",
+    "title": "Thamma",
+    "description": "Dinesh Vijan`s Maddock Horror comedy universe needed a love story. Unfortunately, it`s a bloody one.",
+    "date": "21 Oct, 2025",
+    "time": "4:00 PM",
+    "venue": "PVR Cinemas, Andheri",
+    "price": "350", // 💰 Added
+  },
+  {
+    "image": "assets/images/events/music3.png",
+    "title": "Papon | Shaam-E-Mehfil",
+    "description": "Shaam-E-Mehfil is a performance presented by Papon with his band of super talented musicians of this country.",
+    "date": "Oct 11, 2025",
+    "time": "8:00 PM",
+    "venue": "NCPA, Mumbai",
+    "price": "1800", // 💰 Added
+  },
+  {
+    "image": "assets/images/movies/movies1.png",
+    "title": "Baahubali: The Epic",
+    "description": "Baahubali: The Epic is a combined narrative...",
+    "date": "31 Oct, 2025",
+    "time": "6:00 PM",
+    "venue": "INOX, Malad",
+    "price": "500", // 💰 Added
+  },
+];
 
   final List<String> _locations = [
-    "Mumbai, Maharashtra - 400001",
-    "Delhi, Connaught Place - 110001",
-    "Bangalore, MG Road - 560001",
-    "Chennai, T Nagar - 600017",
-    "Hyderabad, Banjara Hills - 500034",
-    "Pune, FC Road - 411005",
-    "Kolkata, Park Street - 700016",
-    "Jaipur, MI Road - 302001",
+    "Powai, Mumbai - 400076",
+    "Vile Parle, Mumbai - 400056",
+    "Mira Road, Mumbai - 401105",
   ];
 
-  String _selectedLocation = "Mumbai, Maharashtra - 400001";
+  String _selectedLocation = "Powai, Mumbai - 400076";
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +338,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      "assets/images/ai_assistant_logo.png",
+                      "assets/images/logos/ai_assistant_logo.png",
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -338,10 +356,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return ListTile(
       leading: Icon(icon, color: Colors.white),
       title: Text(title, style: const TextStyle(color: Colors.white)),
-      onTap: onTap ??
-          () {
-            Navigator.pop(context);
-          },
+      onTap: onTap ?? () => Navigator.pop(context),
     );
   }
 
@@ -375,7 +390,7 @@ class _DashboardPageState extends State<DashboardPage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             OptionItem(
-              imagePath: "assets/images/for_you.png",
+              imagePath: "assets/images/logos/for_you.png",
               label: "For You",
               onTap: () {
                 Navigator.push(
@@ -385,7 +400,7 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             OptionItem(
-              imagePath: "assets/images/dining.png",
+              imagePath: "assets/images/logos/dining.png",
               label: "Dining",
               onTap: () {
                 Navigator.push(
@@ -395,7 +410,7 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             OptionItem(
-              imagePath: "assets/images/movies.png",
+              imagePath: "assets/images/logos/movies.png",
               label: "Movies",
               onTap: () {
                 Navigator.push(
@@ -405,7 +420,7 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             OptionItem(
-              imagePath: "assets/images/events.png",
+              imagePath: "assets/images/logos/events.png",
               label: "Events",
               onTap: () {
                 Navigator.push(
@@ -415,7 +430,7 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             OptionItem(
-              imagePath: "assets/images/activities.png",
+              imagePath: "assets/images/logos/activities.png",
               label: "Activities",
               onTap: () {
                 Navigator.push(
@@ -537,18 +552,36 @@ class _DashboardPageState extends State<DashboardPage> {
               final item = _spotlightItems[index];
               return GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BookingPage(
-                        title: item["title"]!,
-                        image: item["image"]!,
-                        description: item["description"]!,
-                        date: item["date"]!,
-                        time: item["time"]!,
+                  if (item["image"]!.contains("dining")) {
+                    // ✅ Redirect dining items to DiningBookingPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DiningBookingPage(
+                          title: item["title"]!,
+                          image: item["image"]!,
+                          description: item["description"]!,
+                          venue: item["venue"]!,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    // ✅ Other items use generic BookingPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BookingPage(
+                          title: item["title"]!,
+                          image: item["image"]!,
+                          description: item["description"]!,
+                          date: item["date"] ?? "",
+                          time: item["time"] ?? "",
+                          venue: item["venue"]!,
+                          price: double.tryParse(item["price"] ?? "0") ?? 0,
+                        ),
+                      ),
+                    );
+                  }
                 },
                 child: Container(
                   width: 160,
@@ -560,8 +593,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
-                        borderRadius:
-                            const BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                         child: Image.asset(
                           item["image"]!,
                           fit: BoxFit.cover,
@@ -570,34 +602,37 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                item["title"]!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                item["description"] ?? "",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white70,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          item["title"]!,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.white,
+          ),
+          maxLines: 1, // ✅ Prevents title overflow
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          item["description"] ?? "",
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.white70,
+          ),
+          maxLines: 2, // ✅ Prevents description overflow
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    ),
+  ),
+),
+
                     ],
                   ),
                 ),

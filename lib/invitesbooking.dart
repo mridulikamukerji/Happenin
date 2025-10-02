@@ -19,7 +19,7 @@ class InvitesBookingPage extends StatefulWidget {
 
 class _InvitesBookingPageState extends State<InvitesBookingPage> {
   DateTime? _selectedDateTime;
-  bool _bookingConfirmed = false;
+  bool _bookingConfirmed = false; // ✅ Now properly used
 
   final String _venueAddress = "123 Dummy Venue Street, Wonderland City";
 
@@ -100,7 +100,7 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
               surface: Colors.black,
               onSurface: Colors.white,
             ),
-            dialogTheme: DialogThemeData(backgroundColor: Colors.grey[900]),
+            dialogTheme: DialogThemeData(backgroundColor: Colors.grey),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: Colors.white),
             ),
@@ -168,14 +168,14 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
     );
 
     if (paymentSuccess == true) {
+      setState(() {
+        _bookingConfirmed = true; // ✅ Mark booking as confirmed
+      });
+
       final dateStr =
           "${_selectedDateTime!.year}-${_selectedDateTime!.month.toString().padLeft(2, '0')}-${_selectedDateTime!.day.toString().padLeft(2, '0')}";
       final timeStr =
           "${_selectedDateTime!.hour.toString().padLeft(2, '0')}:${_selectedDateTime!.minute.toString().padLeft(2, '0')}";
-
-      setState(() {
-        _bookingConfirmed = true;
-      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -266,64 +266,67 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // ✅ Event Date & Time Info
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        "Scheduled Event Date:",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        scheduledDate,
-                        style: const TextStyle(
-                            fontSize: 15, color: Colors.white70),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Scheduled Event Time:",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        scheduledTime,
-                        style: const TextStyle(
-                            fontSize: 15, color: Colors.white70),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Venue:",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        _venueAddress,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 15, color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                ),
+// ✅ Event Info (Date and Time separate, plus Venue and Cost)
+Container(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  decoration: BoxDecoration(
+    color: Colors.white.withOpacity(0.15),
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: Column(
+    children: [
+      const Text(
+        "Scheduled Event Date:",
+        style: TextStyle(
+            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      const SizedBox(height: 6),
+      Text(
+        scheduledDate,
+        style: const TextStyle(fontSize: 15, color: Colors.white70),
+      ),
+      const SizedBox(height: 10),
+      const Text(
+        "Scheduled Event Time:",
+        style: TextStyle(
+            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      const SizedBox(height: 6),
+      Text(
+        scheduledTime,
+        style: const TextStyle(fontSize: 15, color: Colors.white70),
+      ),
+      const SizedBox(height: 10),
+      const Text(
+        "Venue:",
+        style: TextStyle(
+            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      const SizedBox(height: 6),
+      Text(
+        _venueAddress,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 15, color: Colors.white70),
+      ),
+      const SizedBox(height: 10),
+      const Text(
+        "Cost per Person:",
+        style: TextStyle(
+            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      const SizedBox(height: 6),
+      Text(
+        "₹499", // Replace with dynamic price if needed
+        style: const TextStyle(fontSize: 15, color: Colors.white70),
+      ),
+    ],
+  ),
+),
+
+
                 const SizedBox(height: 30),
 
-                // ✅ Collapsible Attending Participants
+                // ✅ Attendees
                 ExpansionTile(
                   backgroundColor: Colors.white.withOpacity(0.15),
                   collapsedBackgroundColor: Colors.white.withOpacity(0.1),
@@ -342,7 +345,8 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 12),
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundImage: AssetImage(p["image"]),
@@ -364,7 +368,7 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // 💬 Collapsible Feedback Section
+                // 💬 Feedback
                 ExpansionTile(
                   backgroundColor: Colors.white.withOpacity(0.15),
                   collapsedBackgroundColor: Colors.white.withOpacity(0.1),
@@ -379,7 +383,8 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
                   collapsedIconColor: Colors.white,
                   children: _feedbackList.map((f) {
                     return ListTile(
-                      leading: const Icon(Icons.comment, color: Colors.white),
+                      leading:
+                          const Icon(Icons.comment, color: Colors.white),
                       title: Text(
                         f["user"]!,
                         style: const TextStyle(
@@ -400,7 +405,8 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF2E0B5C),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -420,7 +426,8 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF2E0B5C),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -432,6 +439,33 @@ class _InvitesBookingPageState extends State<InvitesBookingPage> {
                   ),
                   onPressed: _goToPayment,
                 ),
+
+                const SizedBox(height: 20),
+
+                // ✅ Show booking confirmation status
+                if (_bookingConfirmed)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green),
+                        SizedBox(width: 8),
+                        Text(
+                          "Your booking is confirmed!",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

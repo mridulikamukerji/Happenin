@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'booking.dart'; // ✅ Import your booking page
+import 'diningbooking.dart'; // ✅ Import your booking page
 
 class DiningPage extends StatefulWidget {
   const DiningPage({super.key});
@@ -11,25 +11,29 @@ class DiningPage extends StatefulWidget {
 class _DiningPageState extends State<DiningPage> {
   final List<Map<String, String>> _diningItems = [
     {
-      "image": "assets/images/spotlight1.png",
-      "title": "Music Festival",
-      "description": "Experience live performances this weekend!",
-      "date": "Oct 5, 2025",
-      "time": "7:30 PM",
+      "image": "assets/images/dining/dining1.png",
+      "title": "British Brewing Company",
+      "description": "Experience delicious cuisines and amazing service!",
+      "venue": "123 London St, Mumbai",
     },
     {
-      "image": "assets/images/spotlight2.png",
-      "title": "Art Exhibition",
-      "description": "Explore modern art from top creators.",
-      "date": "Oct 12, 2025",
-      "time": "12:00 PM",
+      "image": "assets/images/dining/dining2.png",
+      "title": "Nxt Lvl - Chembur",
+      "description":
+          "In a mood for North Indian? Japanese? Continental? This is the right place for you!",
+      "venue": "45 Chembur Rd, Mumbai",
     },
     {
-      "image": "assets/images/spotlight3.png",
-      "title": "Food Carnival",
-      "description": "Taste cuisines from around the world.",
-      "date": "Oct 20, 2025",
-      "time": "1:00 PM",
+      "image": "assets/images/dining/dining3.png",
+      "title": "Fresh Catch",
+      "description": "Bringing Goa to your doorstep...",
+      "venue": "78 Beach Ave, Goa",
+    },
+    {
+      "image": "assets/images/dining/dining4.png",
+      "title": "All Saints",
+      "description": "Famous for leaving a lasting impression...",
+      "venue": "22 High St, Pune",
     },
   ];
 
@@ -60,19 +64,16 @@ class _DiningPageState extends State<DiningPage> {
                 image: item["image"]!,
                 title: item["title"]!,
                 description: item["description"]!,
-                date: item["date"]!,
-                time: item["time"]!,
                 onBook: () {
-                  // ✅ Navigate to booking page
+                  // ✅ Navigate to dining booking page
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BookingPage(
+                      builder: (context) => DiningBookingPage(
                         title: item["title"]!,
                         image: item["image"]!,
                         description: item["description"]!,
-                        date: item["date"]!,
-                        time: item["time"]!,
+                        venue: item["venue"]!,
                       ),
                     ),
                   );
@@ -90,16 +91,12 @@ class _DiningCard extends StatelessWidget {
   final String image;
   final String title;
   final String description;
-  final String date;
-  final String time;
   final VoidCallback onBook;
 
   const _DiningCard({
     required this.image,
     required this.title,
     required this.description,
-    required this.date,
-    required this.time,
     required this.onBook,
   });
 
@@ -149,24 +146,6 @@ class _DiningCard extends StatelessWidget {
                     fontSize: 14,
                     color: Colors.white70,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today, size: 14, color: Colors.white70),
-                    const SizedBox(width: 6),
-                    Text(
-                      date,
-                      style: const TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
-                    const SizedBox(width: 16),
-                    const Icon(Icons.access_time, size: 14, color: Colors.white70),
-                    const SizedBox(width: 6),
-                    Text(
-                      time,
-                      style: const TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
-                  ],
                 ),
                 const SizedBox(height: 12),
                 Align(

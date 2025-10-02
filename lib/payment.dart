@@ -18,7 +18,7 @@ class _PaymentPageState extends State<PaymentPage> {
     'Wallet'
   ];
 
-  // Simulated payment processing
+  // Simulated payment processing (always successful for now)
   Future<void> _processPayment(BuildContext context) async {
     if (_isProcessing) return;
 
@@ -33,12 +33,12 @@ class _PaymentPageState extends State<PaymentPage> {
       _isProcessing = false;
     });
 
-    // Randomly simulate success or failure
-    bool isSuccess = DateTime.now().second % 2 == 0;
+    // ✅ Always successful (no failure simulation)
+    bool isSuccess = true;
 
     showDialog(
       context: context,
-      barrierDismissible: false, // ✅ Force user to press OK
+      barrierDismissible: false, // Force user to press OK
       builder: (_) => AlertDialog(
         backgroundColor: Colors.grey[900],
         shape: RoundedRectangleBorder(
@@ -58,8 +58,8 @@ class _PaymentPageState extends State<PaymentPage> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(); // Close dialog
-              Navigator.pop(context, isSuccess); 
-              // ✅ This returns result to the previous page instead of forcing booking.dart
+              Navigator.pop(context, isSuccess);
+              // ✅ Return result to previous page
             },
             child: const Text(
               'OK',

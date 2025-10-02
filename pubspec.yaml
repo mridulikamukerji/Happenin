@@ -38,33 +38,25 @@ flutter:
     - assets/images/white_logo.png
     - assets/images/black.png
     - assets/videos/splash_screen.mp4
-    - assets/images/google_logo.png
     - assets/images/location_pin.png
     - assets/images/profile_placeholder.png
-    - assets/images/activities.png
-    - assets/images/dining.png
-    - assets/images/events.png
-    - assets/images/for_you.png
-    - assets/images/movies.png
-    - assets/images/openInvitesSlide.png
-    - assets/images/buddyFinderSlide.png
-    - assets/images/mapSlide.png
+    - assets/images/logos/
+    - assets/images/carousel_images/
     - assets/images/spotlight1.png
     - assets/images/spotlight2.png
     - assets/images/spotlight3.png
-    - assets/images/ai_assistant_logo.png
     - assets/images/buddy1.png
     - assets/images/buddy2.png
     - assets/images/buddy3.png
     - assets/images/buddy4.png
     - assets/images/groupchat.png
-    - assets/videos/story1.mp4
-    - assets/videos/story2.mp4
-    - assets/videos/story3.mp4
-    - assets/images/founder1.png
-    - assets/images/founder2.png
-    - assets/images/founder3.png
+    - assets/videos/
+    - assets/images/founders/
     - assets/images/purple_location_pin.png
+    - assets/images/activities/
+    - assets/images/dining/
+    - assets/images/events/
+    - assets/images/movies/
 
 flutter_native_splash:
   android: true

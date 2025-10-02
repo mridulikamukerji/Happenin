@@ -9,29 +9,44 @@ class ActivitiesPage extends StatefulWidget {
 }
 
 class _ActivitiesPageState extends State<ActivitiesPage> {
-  final List<Map<String, String>> _activityItems = [
-    {
-      "image": "assets/images/spotlight1.png",
-      "title": "Music Festival",
-      "description": "Experience live performances this weekend!",
-      "date": "Oct 5, 2025",
-      "time": "6:00 PM",
-    },
-    {
-      "image": "assets/images/spotlight2.png",
-      "title": "Art Exhibition",
-      "description": "Explore modern art from top creators.",
-      "date": "Oct 12, 2025",
-      "time": "11:00 AM",
-    },
-    {
-      "image": "assets/images/spotlight3.png",
-      "title": "Food Carnival",
-      "description": "Taste cuisines from around the world.",
-      "date": "Oct 20, 2025",
-      "time": "1:00 PM",
-    },
-  ];
+  final List<Map<String, dynamic>> _activityItems = [
+  {
+    "image": "assets/images/activities/workshop1.png",
+    "title": "Japanese Kintsugi Workshop",
+    "description": "Step into the ancient Japanese philosophy of Kintsugi!",
+    "date": "Oct 5, 2025",
+    "time": "4:00 PM",
+    "price": 1200.0,
+    "venue": "Art Studio, Mumbai", // ✅ NEW
+  },
+  {
+    "image": "assets/images/activities/workshop2.png",
+    "title": "Designing Your Life with Navyug Mohnot",
+    "description": "Build your way forward with an intentionally designed life!",
+    "date": "Oct 6, 2025",
+    "time": "6:00 PM",
+    "price": 1500.0,
+    "venue": "Community Hall, Delhi", // ✅ NEW
+  },
+  {
+    "image": "assets/images/activities/workshop3.png",
+    "title": "Belly Dance Workshop",
+    "description": "Learn how to belly dance today!",
+    "date": "Oct 4, 2025",
+    "time": "3:00 PM",
+    "price": 1000.0,
+    "venue": "Dance Studio, Pune", // ✅ NEW
+  },
+  {
+    "image": "assets/images/activities/workshop4.png",
+    "title": "Pottery Wheel and Carving by Pastel Mystery",
+    "description": "Join us for a hands-on pottery experience where creativity meets clay!",
+    "date": "Oct 7, 2025",
+    "time": "4:00 PM",
+    "price": 1300.0,
+    "venue": "Clay Art Cafe, Bangalore", // ✅ NEW
+  },
+];
 
   @override
   Widget build(BuildContext context) {
@@ -57,22 +72,26 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             itemBuilder: (context, index) {
               final item = _activityItems[index];
               return _ActivityCard(
-                image: item["image"]!,
-                title: item["title"]!,
-                description: item["description"]!,
-                date: item["date"]!,
-                time: item["time"]!,
+                image: item["image"],
+                title: item["title"],
+                description: item["description"],
+                date: item["date"],
+                time: item["time"],
+                price: item["price"], // ✅ Use price
+                venue: item["venue"], // ✅ pass venue here
                 onBook: () {
                   // ✅ Navigate to booking page
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => BookingPage(
-                        title: item["title"]!,
-                        image: item["image"]!,
-                        description: item["description"]!,
-                        date: item["date"]!,
-                        time: item["time"]!,
+                        title: item["title"],
+                        image: item["image"],
+                        description: item["description"],
+                        date: item["date"],
+                        time: item["time"],
+                        venue: item["venue"],
+                        price: item["price"], // ✅ Pass correct param
                       ),
                     ),
                   );
@@ -92,6 +111,8 @@ class _ActivityCard extends StatelessWidget {
   final String description;
   final String date;
   final String time;
+  final double price; 
+  final String venue;
   final VoidCallback onBook;
 
   const _ActivityCard({
@@ -100,6 +121,8 @@ class _ActivityCard extends StatelessWidget {
     required this.description,
     required this.date,
     required this.time,
+    required this.price,
+    required this.venue,
     required this.onBook,
   });
 
@@ -167,6 +190,15 @@ class _ActivityCard extends StatelessWidget {
                       style: const TextStyle(color: Colors.white70, fontSize: 13),
                     ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "₹${price.toStringAsFixed(2)} per person", // 💰 Display price
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Align(

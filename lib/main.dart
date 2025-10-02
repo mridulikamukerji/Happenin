@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:math';
 
 // Import your other pages
 import 'dashboard.dart';
@@ -387,6 +386,9 @@ class _LoginPageState extends State<LoginPage> {
 /// -------------------------
 /// SIGN UP PAGE
 /// -------------------------
+/// -------------------------
+/// SIGN UP PAGE
+/// -------------------------
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -395,6 +397,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
   File? _profileImage;
   bool _obscurePassword = true;
@@ -420,6 +423,19 @@ class _SignUpPageState extends State<SignUpPage> {
   // Phone verification
   final String _generatedOtp = "123456"; // Dummy OTP
   bool _isPhoneVerified = false;
+  bool _isPhoneValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneController.addListener(_validatePhoneNumber);
+  }
+
+  void _validatePhoneNumber() {
+    setState(() {
+      _isPhoneValid = RegExp(r'^\d{10}$').hasMatch(_phoneController.text.trim());
+    });
+  }
 
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -431,10 +447,10 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _sendOtpToPhone() {
-    if (_phoneController.text.trim().isEmpty) {
+    if (!_isPhoneValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Please enter your phone number first."),
+          content: Text("Enter a valid 10-digit phone number first."),
           backgroundColor: Colors.red,
         ),
       );
@@ -523,6 +539,8 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUpSuccess(BuildContext context) {
+    if (!_formKey.currentState!.validate()) return;
+
     if (_selectedGender == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -581,250 +599,174 @@ class _SignUpPageState extends State<SignUpPage> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Profile picture picker
-                  GestureDetector(
-                    onTap: _pickImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.white24,
-                      backgroundImage:
-                          _profileImage != null ? FileImage(_profileImage!) : null,
-                      child: _profileImage == null
-                          ? const Icon(Icons.add_a_photo,
-                              size: 40, color: Colors.white70)
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Fields
-                  _buildTextField("First Name", controller: _firstNameController),
-                  const SizedBox(height: 20),
-                  _buildTextField("Last Name", controller: _lastNameController),
-                  const SizedBox(height: 20),
-                  _buildTextField("Email",
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress),
-                  const SizedBox(height: 20),
-
-                  // Phone field
-                  _buildTextField("Phone Number",
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone),
-                  const SizedBox(height: 10),
-
-                  // Verify Phone button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: _isPhoneVerified ? null : _sendOtpToPhone,
-                      child: Text(
-                        _isPhoneVerified
-                            ? "Phone Verified"
-                            : "Verify Phone Number",
-                        style: const TextStyle(color: Colors.white),
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
-                  // Gender selection
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Gender",
-                          style: TextStyle(color: Colors.white70, fontSize: 16)),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile<String>(
-                              value: "Woman",
-                              groupValue: _selectedGender,
-                              onChanged: (value) {
-                                setState(() => _selectedGender = value);
-                              },
-                              title: const Text("Woman",
-                                  style: TextStyle(color: Colors.white)),
-                              activeColor: Colors.purple,
-                            ),
-                          ),
-                          Expanded(
-                            child: RadioListTile<String>(
-                              value: "Man",
-                              groupValue: _selectedGender,
-                              onChanged: (value) {
-                                setState(() => _selectedGender = value);
-                              },
-                              title: const Text("Man",
-                                  style: TextStyle(color: Colors.white)),
-                              activeColor: Colors.purple,
-                            ),
-                          ),
-                        ],
+                    // Profile picture picker
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.white24,
+                        backgroundImage: _profileImage != null
+                            ? FileImage(_profileImage!)
+                            : null,
+                        child: _profileImage == null
+                            ? const Icon(Icons.add_a_photo,
+                                size: 40, color: Colors.white70)
+                            : null,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
+                    ),
+                    const SizedBox(height: 30),
 
-                  // Address input
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField("Add Address",
-                            controller: _addressController),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add, color: Colors.white),
-                        onPressed: () {
-                          if (_addressController.text.isNotEmpty) {
-                            setState(() {
-                              _addresses.add(_addressController.text.trim());
-                              _addressController.clear();
-                            });
-                          }
-                        },
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Display addresses
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _addresses.length,
-                    itemBuilder: (context, index) {
-                      final address = _addresses[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.purple,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(address,
-                                    style: const TextStyle(color: Colors.white)),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _addresses.removeAt(index);
-                                  });
-                                },
-                                child:
-                                    const Icon(Icons.close, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                    // Fields with validation
+                    _buildValidatedField("First Name", _firstNameController,
+                        (v) => v!.isEmpty ? "Enter first name" : null),
+                    const SizedBox(height: 20),
+                    _buildValidatedField("Last Name", _lastNameController,
+                        (v) => v!.isEmpty ? "Enter last name" : null),
+                    const SizedBox(height: 20),
+                    _buildValidatedField(
+                        "Email", _emailController, (v) {
+                      if (v == null || v.isEmpty) return "Enter email";
+                      final emailRegex =
+                          RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                      if (!emailRegex.hasMatch(v)) return "Enter valid email";
+                      return null;
                     },
-                  ),
-                  const SizedBox(height: 20),
+                        keyboardType: TextInputType.emailAddress),
+                    const SizedBox(height: 20),
 
-                  // Password field
-                  _buildPasswordField("Password", _obscurePassword, () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  }, _passwordController),
-                  const SizedBox(height: 20),
+                    _buildValidatedField("Phone Number", _phoneController,
+                        (v) {
+                      if (v == null || v.isEmpty) {
+                        return "Enter phone number";
+                      }
+                      if (!RegExp(r'^\d{10}$').hasMatch(v)) {
+                        return "Phone number must be exactly 10 digits";
+                      }
+                      return null;
+                    }, keyboardType: TextInputType.phone),
+                    const SizedBox(height: 10),
 
-                  _buildTextField("Age",
-                      controller: _ageController,
-                      keyboardType: TextInputType.number),
-                  const SizedBox(height: 20),
-                  _buildTextField("Bio", controller: _bioController),
-                  const SizedBox(height: 20),
-
-                  // Interests input
-                  Row(
-                    children: [
-                      Expanded(
-                          child: _buildTextField("Add Interest",
-                              controller: _interestController)),
-                      IconButton(
-                        icon: const Icon(Icons.add, color: Colors.white),
-                        onPressed: () {
-                          if (_interestController.text.isNotEmpty) {
-                            setState(() {
-                              _interests.add(_interestController.text.trim());
-                              _interestController.clear();
-                            });
-                          }
-                        },
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _interests
-                        .map((interest) => Chip(
-                              label: Text(interest,
-                                  style:
-                                      const TextStyle(color: Colors.white)),
-                              backgroundColor: Colors.purple,
-                            ))
-                        .toList(),
-                  ),
-                  const SizedBox(height: 30),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    // Verify Phone button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isPhoneValid && !_isPhoneVerified
+                              ? Colors.purple
+                              : Colors.grey,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: _isPhoneValid && !_isPhoneVerified
+                            ? _sendOtpToPhone
+                            : null,
+                        child: Text(
+                          _isPhoneVerified
+                              ? "Phone Verified"
+                              : "Verify Phone Number",
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
-                      onPressed: () => _signUpSuccess(context),
-                      child: const Text("Sign Up"),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "Already have an account? Login here",
-                      style: TextStyle(color: Colors.white70),
+                    // Password
+                    _buildPasswordField("Password", _passwordController),
+                    const SizedBox(height: 20),
+
+                    _buildValidatedField("Age", _ageController, (v) {
+                      if (v == null || v.isEmpty) return "Enter age";
+                      final age = int.tryParse(v);
+                      if (age == null || age <= 0 || age > 120) {
+                        return "Enter valid age";
+                      }
+                      return null;
+                    }, keyboardType: TextInputType.number),
+                    const SizedBox(height: 20),
+                    _buildValidatedField("Bio", _bioController,
+                        (v) => v!.isEmpty ? "Enter bio" : null),
+                    const SizedBox(height: 20),
+
+                    // Interests
+                    Row(
+                      children: [
+                        Expanded(
+                            child: _buildValidatedField(
+                                "Add Interest", _interestController, (v) => null)),
+                        IconButton(
+                          icon: const Icon(Icons.add, color: Colors.white),
+                          onPressed: () {
+                            if (_interestController.text.isNotEmpty) {
+                              setState(() {
+                                _interests.add(_interestController.text.trim());
+                                _interestController.clear();
+                              });
+                            }
+                          },
+                        )
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _interests
+                          .map((interest) => Chip(
+                                label: Text(interest,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
+                                backgroundColor: Colors.purple,
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: 30),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () => _signUpSuccess(context),
+                        child: const Text("Sign Up"),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        "Already have an account? Login here",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -833,11 +775,12 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildTextField(String label,
-      {TextEditingController? controller,
-      TextInputType keyboardType = TextInputType.text}) {
-    return TextField(
+  Widget _buildValidatedField(
+      String label, TextEditingController controller, String? Function(String?)? validator,
+      {TextInputType keyboardType = TextInputType.text}) {
+    return TextFormField(
       controller: controller,
+      validator: validator,
       keyboardType: keyboardType,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
@@ -853,11 +796,20 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildPasswordField(String label, bool obscure,
-      VoidCallback toggleVisibility, TextEditingController controller) {
-    return TextField(
+  Widget _buildPasswordField(
+      String label, TextEditingController controller) {
+    return TextFormField(
       controller: controller,
-      obscureText: obscure,
+      obscureText: _obscurePassword,
+      validator: (v) {
+        if (v == null || v.isEmpty) return "Enter password";
+        if (v.length < 8) return "Password must be at least 8 characters";
+        if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$')
+            .hasMatch(v)) {
+          return "Must contain letters and numbers";
+        }
+        return null;
+      },
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
@@ -869,9 +821,14 @@ class _SignUpPageState extends State<SignUpPage> {
           borderSide: BorderSide.none,
         ),
         suffixIcon: IconButton(
-          icon: Icon(obscure ? Icons.visibility : Icons.visibility_off,
+          icon: Icon(
+              _obscurePassword ? Icons.visibility : Icons.visibility_off,
               color: Colors.white70),
-          onPressed: toggleVisibility,
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
         ),
       ),
     );

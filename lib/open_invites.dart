@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-import 'dashboard.dart';
-import 'chats.dart';
-import 'shorts.dart';
-import 'stories.dart';
 import 'invitesbooking.dart'; // ✅ Import booking page
 
 class OpenInvitesPage extends StatefulWidget {
@@ -381,11 +377,12 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
   }
 
   // ✅ Add Event Modal (with category dropdown & validation)
+      // ✅ Add Event Modal (with category dropdown & validation)
   void _openAddEventModal(bool isPrivate) {
     TextEditingController titleController = TextEditingController();
     TextEditingController descriptionController = TextEditingController();
-    TextEditingController dateController = TextEditingController();
-    TextEditingController timeController = TextEditingController();
+    TextEditingController startDateController = TextEditingController();
+    TextEditingController endDateController = TextEditingController();
     TextEditingController venueController = TextEditingController();
     TextEditingController startTimeController = TextEditingController();
     TextEditingController endTimeController = TextEditingController();
@@ -394,6 +391,14 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
     List<Map<String, String>> selectedPeople = [];
     File? pickedImage;
     String category = "Dining";
+
+    // ❌ Error messages for inline validation
+    String? titleError;
+    String? venueError;
+    String? dateError;
+    String? timeError;
+    String? imageError;
+    String? participantError;
 
     showModalBottomSheet(
       context: context,
@@ -415,17 +420,14 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                      isPrivate
-                          ? "Add Private Invite"
-                          : "Add Open Invite",
+                  Text(isPrivate ? "Add Private Invite" : "Add Open Invite",
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
 
-                  // ✅ Image Picker
+                  // ✅ Image Picker with inline error
                   GestureDetector(
                     onTap: () async {
                       final ImagePicker picker = ImagePicker();
@@ -434,6 +436,7 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                       if (image != null) {
                         setModalState(() {
                           pickedImage = File(image.path);
+                          imageError = null;
                         });
                       }
                     },
@@ -458,6 +461,12 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                             ),
                     ),
                   ),
+                  if (imageError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(imageError!,
+                          style: const TextStyle(color: Colors.red)),
+                    ),
                   const SizedBox(height: 12),
 
                   // ✅ Category Dropdown
@@ -472,25 +481,34 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                                   style: const TextStyle(color: Colors.white)),
                             ))
                         .toList(),
-                    onChanged: (value) =>
-                        setModalState(() => category = value!),
+                    onChanged: (value) => setModalState(() => category = value!),
                   ),
                   const SizedBox(height: 12),
 
+                  // ✅ Event Name
                   TextField(
                     controller: titleController,
                     style: const TextStyle(color: Colors.white),
                     decoration: _inputDecoration("Event Name"),
+                    onChanged: (_) => setModalState(() => titleError = null),
                   ),
+                  if (titleError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(titleError!,
+                          style: const TextStyle(color: Colors.red)),
+                    ),
                   const SizedBox(height: 12),
+
+                  // ✅ Description
                   TextField(
                     controller: descriptionController,
                     style: const TextStyle(color: Colors.white),
-                    decoration: _inputDecoration("Description"),
+                    decoration: _inputDecoration("Description (Optional)"),
                   ),
                   const SizedBox(height: 12),
 
-                  // ✅ Date & Time Row
+                  // ✅ Date Pickers
                   Row(
                     children: [
                       Expanded(
@@ -510,7 +528,8 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                                       surface: Color(0xFF2E0B5C),
                                       onSurface: Colors.white,
                                     ),
-                                    dialogBackgroundColor: Colors.black87,
+                                    dialogTheme: const DialogThemeData(
+                                        backgroundColor: Colors.black87),
                                   ),
                                   child: child!,
                                 );
@@ -518,14 +537,15 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                             );
                             if (picked != null) {
                               setModalState(() {
-                                dateController.text =
+                                startDateController.text =
                                     "${picked.day}/${picked.month}/${picked.year}";
+                                dateError = null;
                               });
                             }
                           },
                           child: AbsorbPointer(
                             child: TextField(
-                              controller: dateController,
+                              controller: startDateController,
                               style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration("Start Date"),
                             ),
@@ -550,7 +570,8 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                                       surface: Color(0xFF2E0B5C),
                                       onSurface: Colors.white,
                                     ),
-                                    dialogBackgroundColor: Colors.black87,
+                                    dialogTheme: const DialogThemeData(
+                                        backgroundColor: Colors.black87),
                                   ),
                                   child: child!,
                                 );
@@ -558,14 +579,15 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                             );
                             if (picked != null) {
                               setModalState(() {
-                                timeController.text =
+                                endDateController.text =
                                     "${picked.day}/${picked.month}/${picked.year}";
+                                dateError = null;
                               });
                             }
                           },
                           child: AbsorbPointer(
                             child: TextField(
-                              controller: timeController,
+                              controller: endDateController,
                               style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration("End Date"),
                             ),
@@ -574,8 +596,15 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                       ),
                     ],
                   ),
+                  if (dateError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(dateError!,
+                          style: const TextStyle(color: Colors.red)),
+                    ),
                   const SizedBox(height: 12),
 
+                  // ✅ Time Pickers
                   Row(
                     children: [
                       Expanded(
@@ -593,7 +622,7 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                                       surface: Color(0xFF2E0B5C),
                                       onSurface: Colors.white,
                                     ),
-                                    timePickerTheme: TimePickerThemeData(
+                                    timePickerTheme: const TimePickerThemeData(
                                       backgroundColor: Colors.black87,
                                     ),
                                   ),
@@ -603,7 +632,9 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                             );
                             if (picked != null) {
                               setModalState(() {
-                                startTimeController.text = picked.format(context);
+                                startTimeController.text =
+                                    picked.format(context);
+                                timeError = null;
                               });
                             }
                           },
@@ -632,7 +663,7 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                                       surface: Color(0xFF2E0B5C),
                                       onSurface: Colors.white,
                                     ),
-                                    timePickerTheme: TimePickerThemeData(
+                                    timePickerTheme: const TimePickerThemeData(
                                       backgroundColor: Colors.black87,
                                     ),
                                   ),
@@ -643,6 +674,7 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                             if (picked != null) {
                               setModalState(() {
                                 endTimeController.text = picked.format(context);
+                                timeError = null;
                               });
                             }
                           },
@@ -657,17 +689,30 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20), 
+                  if (timeError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(timeError!,
+                          style: const TextStyle(color: Colors.red)),
+                    ),
+                  const SizedBox(height: 12),
 
                   // ✅ Venue
                   TextField(
                     controller: venueController,
                     style: const TextStyle(color: Colors.white),
                     decoration: _inputDecoration("Venue"),
+                    onChanged: (_) => setModalState(() => venueError = null),
                   ),
+                  if (venueError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(venueError!,
+                          style: const TextStyle(color: Colors.red)),
+                    ),
                   const SizedBox(height: 12),
 
-                  // ✅ Gender selection for Open Invites
+                  // ✅ Gender for Open Invites
                   if (!isPrivate)
                     DropdownButtonFormField<String>(
                       value: gender,
@@ -701,13 +746,17 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                             await showModalBottomSheet(
                           context: context,
                           backgroundColor: _slideColor,
+                          isScrollControlled: true,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.vertical(
                                 top: Radius.circular(20)),
                           ),
                           builder: (context) {
-                            List<bool> tempSelected =
-                                List.filled(people.length, false);
+                            // ✅ Pre-fill selection state
+                            List<bool> tempSelected = people
+                                .map((p) => selectedPeople.contains(p))
+                                .toList();
+
                             return StatefulBuilder(
                                 builder: (context, setSheetState) {
                               return Padding(
@@ -754,10 +803,11 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                                           people
                                               .asMap()
                                               .entries
-                                              .where((e) => tempSelected[e.key])
+                                              .where((e) =>
+                                                  tempSelected[e.key])
                                               .map((e) => e.value)
                                               .toList()
-                                              .cast<Map<String, String>>(), // ✅ Fixed type
+                                              .cast<Map<String, String>>(),
                                         );
                                       },
                                       child: const Text("Done",
@@ -774,10 +824,17 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                         if (picked != null) {
                           setModalState(() {
                             selectedPeople = picked;
+                            participantError = null;
                           });
                         }
                       },
                     ),
+                    if (participantError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(participantError!,
+                            style: const TextStyle(color: Colors.red)),
+                      ),
                     const SizedBox(height: 12),
                     if (selectedPeople.isNotEmpty)
                       Wrap(
@@ -785,12 +842,10 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                         children: selectedPeople
                             .map((p) => Chip(
                                   avatar: CircleAvatar(
-                                    backgroundImage:
-                                        AssetImage(p['image']!),
+                                    backgroundImage: AssetImage(p['image']!),
                                   ),
                                   label: Text(p['name']!,
-                                      style: const TextStyle(
-                                          color: Colors.white)),
+                                      style: const TextStyle(color: Colors.white)),
                                   backgroundColor:
                                       Colors.black.withOpacity(0.4),
                                 ))
@@ -799,44 +854,107 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                   ],
 
                   const SizedBox(height: 20),
+
+                  // ✅ Add Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purpleAccent,
                     ),
                     onPressed: () {
-                      // ✅ Validation
-                      if (titleController.text.isEmpty ||
-                          dateController.text.isEmpty ||
-                          timeController.text.isEmpty ||
-                          venueController.text.isEmpty ||
-                          pickedImage == null ||
-                          (!isPrivate && gender.isEmpty) ||
-                          (category.isEmpty)) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                "Please fill all mandatory fields (except Description)"),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                      // Reset errors
+                      setModalState(() {
+                        titleError = null;
+                        venueError = null;
+                        dateError = null;
+                        timeError = null;
+                        imageError = null;
+                        participantError = null;
+                      });
+
+                      bool hasError = false;
+
+                      if (titleController.text.trim().isEmpty) {
+                        titleError = "Event name is required";
+                        hasError = true;
+                      }
+                      if (venueController.text.trim().isEmpty) {
+                        venueError = "Venue is required";
+                        hasError = true;
+                      }
+                      if (startDateController.text.isEmpty ||
+                          endDateController.text.isEmpty) {
+                        dateError = "Start and End dates are required";
+                        hasError = true;
+                      }
+                      if (startTimeController.text.isEmpty ||
+                          endTimeController.text.isEmpty) {
+                        timeError = "Start and End times are required";
+                        hasError = true;
+                      }
+                      if (pickedImage == null) {
+                        imageError = "Please select an image";
+                        hasError = true;
+                      }
+                      if (isPrivate && selectedPeople.isEmpty) {
+                        participantError =
+                            "Please add at least one participant";
+                        hasError = true;
+                      }
+
+                      // ✅ Advanced Validations
+                      if (startDateController.text.isNotEmpty &&
+                          endDateController.text.isNotEmpty) {
+                        final startDateParts =
+                            startDateController.text.split("/");
+                        final endDateParts = endDateController.text.split("/");
+                        final startDate = DateTime(
+                            int.parse(startDateParts[2]),
+                            int.parse(startDateParts[1]),
+                            int.parse(startDateParts[0]));
+                        final endDate = DateTime(
+                            int.parse(endDateParts[2]),
+                            int.parse(endDateParts[1]),
+                            int.parse(endDateParts[0]));
+
+                        if (endDate.isBefore(startDate)) {
+                          dateError = "End date cannot be before start date";
+                          hasError = true;
+                        } else if (startDate.isAtSameMomentAs(endDate)) {
+                          if (startTimeController.text.isNotEmpty &&
+                              endTimeController.text.isNotEmpty &&
+                              startTimeController.text ==
+                                  endTimeController.text) {
+                            timeError =
+                                "Start and End time cannot be the same on the same day";
+                            hasError = true;
+                          }
+                        }
+                      }
+
+                      if (hasError) {
+                        setModalState(() {});
                         return;
                       }
 
+                      // ✅ Build new event map
                       Map<String, dynamic> newEvent = {
                         "title": titleController.text,
                         "description": descriptionController.text,
-                        "date": dateController.text,
-                        "time": timeController.text,
+                        "date":
+                            "${startDateController.text} - ${endDateController.text}",
+                        "time":
+                            "${startTimeController.text} - ${endTimeController.text}",
                         "venue": venueController.text,
                         "image": pickedImage?.path ??
                             "assets/images/spotlight1.png",
                         "rating": 0,
                       };
+
                       if (!isPrivate) {
                         newEvent["gender"] = gender;
                         newEvent["category"] = category;
-                        int catIndex = _categories.indexWhere(
-                            (c) => c["label"] == category);
+                        int catIndex = _categories
+                            .indexWhere((c) => c["label"] == category);
                         if (catIndex != -1) {
                           _categories[catIndex]["events"].add(newEvent);
                         }
@@ -844,6 +962,7 @@ class _OpenInvitesPageState extends State<OpenInvitesPage>
                         newEvent["participants"] = selectedPeople;
                         _privateInvites.add(newEvent);
                       }
+
                       setState(() {});
                       Navigator.pop(context);
                     },
