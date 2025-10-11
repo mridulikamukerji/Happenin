@@ -23,6 +23,7 @@ import 'myprofile.dart';
 import 'upcoming_outings.dart';
 import 'open_invites.dart';
 import 'maps.dart';
+import 'myevents.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -141,6 +142,13 @@ class _DashboardPageState extends State<DashboardPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const MyProfilePage()),
+              );
+            }),
+            _buildDrawerItem(Icons.local_activity, "My Events", onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MyEventsPage()),
               );
             }),
             _buildDrawerItem(Icons.person, "Upcoming Outings", onTap: () {
